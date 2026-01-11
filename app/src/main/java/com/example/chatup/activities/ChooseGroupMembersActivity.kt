@@ -42,6 +42,10 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
         initAdapter()
 
         selectUsersForGroupChat()
+
+        binding.btnBackAfl.setOnClickListener {
+            finish()
+        }
     }
 
     /**
