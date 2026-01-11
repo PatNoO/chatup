@@ -22,20 +22,25 @@ class UsersFragment : Fragment(R.layout.fragment_users_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // ============= Initilize ViewModel, find RecyclerView and set layout manager ==============
         userViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
         val recycler = view.findViewById<RecyclerView>(R.id.usersRecycler)
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
 
+        // =============== Create adapter and handle user click ==============
         adapter = UserAdapter(emptyList()) { user ->
             val intent = Intent(requireContext(), ChatActivity::class.java)
             intent.putExtra("userId", user.uid)
             intent.putExtra("userName", user.username)
             startActivity(intent)
         }
+
+        // ============== Attach adapter ro RecyclerView ===============
         recycler.adapter = adapter
 
+        // ============== Observe users livedata, update the list and fetch all users ===============
         userViewModel.users.observe(viewLifecycleOwner) { adapter.update(it) }
         userViewModel.getAllUsers()
     }

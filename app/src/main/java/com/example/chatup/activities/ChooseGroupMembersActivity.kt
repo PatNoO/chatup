@@ -8,6 +8,7 @@ import android.widget.CheckedTextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.chatup.activities.ChatActivity
 import com.example.chatup.data.User
 import com.example.chatup.databinding.ActivityChooseGroupMembersBinding
 import com.example.chatup.viewmodel.ChatViewModel
@@ -36,14 +37,11 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
         chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
         usersViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
-
         loadUsers()
 
         initAdapter()
 
         selectUsersForGroupChat()
-
-
     }
 
     /**
@@ -69,7 +67,6 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
 
         binding.lvUsersListAfl.setOnItemClickListener { _, view, pos, _ ->
 
-
             val user = friendList[pos]
             val checkedView = view as CheckedTextView
 
@@ -77,12 +74,10 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
                 selectedUser.add(user)
             } else {
                 selectedUser.remove(user)
-
             }
         }
 
         startGroupChat(selectedUser)
-
     }
 
     /**
@@ -102,7 +97,6 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
                     getString(com.example.chatup.R.string.choose_a_group_name), Toast.LENGTH_SHORT
                 ).show()
                 return@setOnClickListener
-
             }
 
             if (selectedUsers.size < 2) {
@@ -127,7 +121,6 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
 
                 startActivity(intent)
             }
-
         }
     }
 

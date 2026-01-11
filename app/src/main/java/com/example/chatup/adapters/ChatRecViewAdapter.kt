@@ -160,8 +160,6 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.binding.tvFriendNameImr.text = senderName ?: "unknown"
 
         }
-
-
     }
 
     override fun getItemCount(): Int {

@@ -52,8 +52,6 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
             startActivity(intent)
         }
-
-
         recycler.adapter = adapter
 
         conversationListViewModel.conversationList.observe(viewLifecycleOwner) {

@@ -46,31 +46,25 @@ class ConversationListAdapter(
             holder.binding.ivCheckSentIcl.isVisible = false
             holder.binding.ivCheckDeliveredIcl.isVisible = false
 
-
             when {
                 conversation.lastMessageSeen -> {
                     holder.binding.ivCheckDeliveredIcl.setImageResource(R.drawable.seen_outline_check_small_24)
                     holder.binding.ivCheckSentIcl.setImageResource(R.drawable.seen_outline_check_small_24)
                     holder.binding.ivCheckSentIcl.isVisible = true
                     holder.binding.ivCheckDeliveredIcl.isVisible = true
-
                 }
-
                 conversation.lastMessageDelivered -> {
                     holder.binding.ivCheckDeliveredIcl.setImageResource(R.drawable.outline_check_small_24)
                     holder.binding.ivCheckSentIcl.setImageResource(R.drawable.outline_check_small_24)
                     holder.binding.ivCheckDeliveredIcl.isVisible = true
                     holder.binding.ivCheckSentIcl.isVisible = true
                 }
-
                 else -> {
                     holder.binding.ivCheckSentIcl.setImageResource(R.drawable.outline_check_small_24)
                     holder.binding.ivCheckSentIcl.isVisible = true
                 }
 
             }
-
-
         }
 
         holder.binding.conversationListCardView.setOnClickListener {

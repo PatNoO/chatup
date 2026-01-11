@@ -26,6 +26,7 @@ class UsersViewModel : ViewModel() {
         })
     }
 
+    // ============== Search users by email och username ==============
     fun searchUsers(query: String) {
         if (query.isBlank()) {
             _users.value = originalUserList
@@ -39,6 +40,7 @@ class UsersViewModel : ViewModel() {
         }
     }
 
+    // =============== Create a new group conversation ==============
     fun createGroup(
         groupName: String,
         members: List<String>,

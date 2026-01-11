@@ -58,8 +58,6 @@ class ConversationListViewModel : ViewModel() {
                         val lastMessageDelivered = doc.getBoolean("lastMessageDelivered") ?: false
                         val lastUpdated = doc.getLong("lastUpdated") ?: 0L
                         val groupName = doc.getString("name") ?: ""
-                        Log.d("DEBUG_CONV_LIST", "Conversation ${doc.id} has name='$groupName'")
-
 
                         val friendUsername = if (conversationType == "private") {
                             val friendId = usersInConversation.firstOrNull { it != currentUserId }
@@ -80,11 +78,9 @@ class ConversationListViewModel : ViewModel() {
                             name = groupName
                         )
                     }
-
                     _conversationList.postValue(convList)
                 }
             }
-
     }
 
     // ============= Gets all users except the current one ==============
@@ -99,6 +95,7 @@ class ConversationListViewModel : ViewModel() {
 
         return users
     }
+
 
 
 }
