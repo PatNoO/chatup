@@ -95,12 +95,6 @@ class FriendListActivity : AppCompatActivity() {
 
 
             usersViewModel.createGroup(groupName = groupName, selectedUserIds) { conversationId ->
-                Log.d("DEBUG_GROUP", "Created group conversationId = $conversationId")
-                Log.d(
-                    "DEBUG_GROUP_CREATE",
-                    "Group created with id=$conversationId and name=$groupName"
-                )
-
 
                 val intent = Intent(this, ChatActivity::class.java)
                 intent.putExtra("conversationId", conversationId)

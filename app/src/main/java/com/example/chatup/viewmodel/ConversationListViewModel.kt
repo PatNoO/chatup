@@ -38,11 +38,9 @@ class ConversationListViewModel : ViewModel() {
             .orderBy("lastUpdated", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, e ->
                 if (e != null || snapshot == null) {
-                    Log.e("DEBUG_CONV_LIST", "Snapshot error: ${e?.message}")
                     return@addSnapshotListener
                 }
 
-                Log.d("DEBUG_CONV_LIST", "Snapshot received with ${snapshot.size()} documents")
 
                 viewModelScope.launch {
                     val users = getUsers()
@@ -51,8 +49,6 @@ class ConversationListViewModel : ViewModel() {
                         val conversationType = doc.getString("conversationType") ?: "private"
                         val usersInConversation = doc.get("users") as? List<String> ?: emptyList()
                         val conversationId = doc.id
-
-
 
                         if (!usersInConversation.contains(currentUserId)) return@mapNotNull null
 
@@ -72,11 +68,6 @@ class ConversationListViewModel : ViewModel() {
                         } else {
                             groupName
                         }
-                        Log.d(
-                            "DEBUG_CONV_LIST",
-                            "Processing conversation $conversationId, type=$conversationType, users=$usersInConversation, name='$groupName'"
-                        )
-
 
                         ConversationList(
                             conversationId = conversationId,
@@ -90,8 +81,6 @@ class ConversationListViewModel : ViewModel() {
                             name = groupName
                         )
                     }
-
-                    Log.d("DEBUG_CONV_LIST", "Posting ${convList.size} conversations to LiveData")
 
                     _conversationList.postValue(convList)
                 }

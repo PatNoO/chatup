@@ -34,7 +34,6 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
         // ============== Initilize adapter and click =========
         adapter = ConversationListAdapter(emptyList()) { conversation ->
-            Log.d("DEBUG_CONV_LIST", "Clicked conversation ${conversation.conversationId}, type=${conversation.conversationType}, name='${conversation.name}'")
 
             val intent = Intent(requireContext(), ChatActivity::class.java)
 
@@ -42,28 +41,16 @@ class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
             intent.putExtra("isGroup", conversation.conversationType == "group")
 
             if (conversation.conversationType == "group") {
-
                 intent.putExtra("groupName", conversation.name)
                 intent.putStringArrayListExtra("chatPartnersId", ArrayList(conversation.users))
 
-                Log.d("DEBUG_CONV_LIST", "Group chat: groupName='${conversation.name}', members=${conversation.users}")
-
             } else {
-
                 val currentUserId = Firebase.auth.currentUser?.uid
                 val friendId = conversation.users.first { it != currentUserId }
 
                 intent.putExtra("userId", friendId)
                 intent.putExtra("userName", conversation.friendUsername ?: "Chat")
-                Log.d("DEBUG_CONV_LIST", "Private chat with friendId=$friendId, friendUsername='${conversation.friendUsername}'")
-
             }
-
-            Log.d(
-                "OPEN_CHAT",
-                "Open chat: id=${conversation.conversationId}, type=${conversation.conversationType}"
-            )
-
 
             startActivity(intent)
         }
