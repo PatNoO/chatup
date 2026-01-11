@@ -8,15 +8,16 @@ import com.example.chatup.data.User
 import com.example.chatup.databinding.ItemUserBinding
 
 
-class UserAdapter(private var users: List<User>,  private val onUserClicked: (User) -> Unit) :
+class UserAdapter(private var users: List<User>, private val onUserClicked: (User) -> Unit) :
     RecyclerView.Adapter<UserAdapter.UsersViewHolder>() {
 
     // ============== ViewHolder class ================
-    inner class UsersViewHolder (val binding : ItemUserBinding) : RecyclerView.ViewHolder (binding.root)
+    inner class UsersViewHolder(val binding: ItemUserBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     // ============= Create new object of ViewHolder ==============
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsersViewHolder {
-        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return UsersViewHolder(binding)
     }
 

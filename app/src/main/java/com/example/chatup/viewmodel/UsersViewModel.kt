@@ -39,10 +39,10 @@ class UsersViewModel : ViewModel() {
         }
     }
 
-    fun createGroup (
-        groupName : String,
-        members : List<String>,
-        onComplete : (String) -> Unit
+    fun createGroup(
+        groupName: String,
+        members: List<String>,
+        onComplete: (String) -> Unit
     ) {
         FirebaseManager.createGroupConversation(
             groupName = groupName,

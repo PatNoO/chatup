@@ -15,11 +15,11 @@ import com.google.firebase.firestore.ListenerRegistration
  */
 class ChatViewModel : ViewModel() {
 
-    private var checkDeliveredListener : ListenerRegistration ? = null
+    private var checkDeliveredListener: ListenerRegistration? = null
     private var chatListener: ListenerRegistration? = null
     private var typingListener: ListenerRegistration? = null
 
-    private var conversationId : String = ""
+    private var conversationId: String = ""
 
     private val _chatOpened = MutableLiveData<Boolean>()
 
@@ -54,6 +54,7 @@ class ChatViewModel : ViewModel() {
     fun setOtherUserId(userId: String) {
         _otherUserId.value = userId
     }
+
     /**
      * Marks the chat as opened or closed.
      *
@@ -92,7 +93,7 @@ class ChatViewModel : ViewModel() {
 
         _otherUserId.value = otherUserId
 
-        conversationId = FirebaseManager.createConversationId( otherUserId)
+        conversationId = FirebaseManager.createConversationId(otherUserId)
 
         chatListener?.remove()
 
@@ -100,7 +101,7 @@ class ChatViewModel : ViewModel() {
             conversationId = conversationId,
             onUpdate = { messages ->
                 _chatMessage.postValue(messages.toList())
-            }, chatIsOpened = {isChatOpened()}
+            }, chatIsOpened = { isChatOpened() }
         )
 
         typingListener?.remove()

@@ -45,7 +45,8 @@ class ProfileActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
+        val toggle =
+            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         toggle.drawerArrowDrawable.color = Color.WHITE
@@ -82,16 +83,23 @@ class ProfileActivity : AppCompatActivity() {
             val newImageUrl = etProfileImageUrl.text.toString()
 
             if (newUsername.isNotBlank()) {
-                profileViewModel.updateUserProfile(newUsername, if (newImageUrl.isNotBlank()) newImageUrl else null)
-                Toast.makeText(this,
-                    getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
+                profileViewModel.updateUserProfile(
+                    newUsername,
+                    if (newImageUrl.isNotBlank()) newImageUrl else null
+                )
+                Toast.makeText(
+                    this,
+                    getString(R.string.profile_updated), Toast.LENGTH_SHORT
+                ).show()
 
-                 if (newImageUrl.isNotBlank()) {
+                if (newImageUrl.isNotBlank()) {
                     Glide.with(this).load(newImageUrl).into(ivProfileImage)
                 }
             } else {
-                Toast.makeText(this,
-                    getString(R.string.username_empty), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.username_empty), Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -106,9 +114,10 @@ class ProfileActivity : AppCompatActivity() {
                     val intent = Intent(this, StartMenuActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     startActivity(intent)
-                    finish() 
+                    finish()
                     true
                 }
+
                 R.id.menu_users -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     val intent = Intent(this, StartMenuActivity::class.java)
@@ -117,16 +126,19 @@ class ProfileActivity : AppCompatActivity() {
                     finish()
                     true
                 }
+
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SearchActivity::class.java))
                     true
                 }
+
                 R.id.menu_settings -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
+
                 R.id.menu_logout -> {
                     authViewModel.signOut()
                     val intent = Intent(this, LoginActivity::class.java)
@@ -134,11 +146,13 @@ class ProfileActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                 R.id.menu_profile -> {
+
+                R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     // Redan på profilsidan
                     true
                 }
+
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true

@@ -73,16 +73,16 @@ class ChatActivity : AppCompatActivity() {
             Log.e("DEBUG_GROUP", "conversationId is null!")
             return
         }
-            chatViewModel.setOtherUserId(otherUserId)
-            chatViewModel.initChat(otherUserId)
-            chatViewModel.setOtherUserName(otherUserName)
+        chatViewModel.setOtherUserId(otherUserId)
+        chatViewModel.initChat(otherUserId)
+        chatViewModel.setOtherUserName(otherUserName)
 
-            binding.tvReceiverNameAc.text = otherUserName
+        binding.tvReceiverNameAc.text = otherUserName
 
         binding.etMessageAc.addTextChangedListener { editText ->
-            if (editText.isNullOrBlank()){
+            if (editText.isNullOrBlank()) {
                 chatViewModel.setTyping(false)
-            }else {
+            } else {
                 chatViewModel.setTyping(true)
             }
         }
@@ -90,30 +90,30 @@ class ChatActivity : AppCompatActivity() {
         chatViewModel.isTyping.observe(this) { isTyping ->
             if (isTyping) {
                 binding.tvIsTextingAc.text = getString(R.string.is_typing, otherUserName)
-            }else {
+            } else {
                 binding.tvIsTextingAc.text = ""
             }
         }
 
-            chatViewModel.otherUserName.observe(this) { name ->
-                adapter.setChatUsers(isGroup = false, chatPartner = name)
-            }
+        chatViewModel.otherUserName.observe(this) { name ->
+            adapter.setChatUsers(isGroup = false, chatPartner = name)
+        }
 
-            chatViewModel.chatMessage.observe(this) { chatMessages ->
-                adapter.submitList(chatMessages)
-                if (chatMessages.isNotEmpty()) {
-                    binding.rvChatAc.scrollToPosition(chatMessages.size - 1) // scroll to last chatMessage
-                }
+        chatViewModel.chatMessage.observe(this) { chatMessages ->
+            adapter.submitList(chatMessages)
+            if (chatMessages.isNotEmpty()) {
+                binding.rvChatAc.scrollToPosition(chatMessages.size - 1) // scroll to last chatMessage
             }
+        }
 
 
-            binding.fabSendAc.setOnClickListener {
-                val sendChatText = binding.etMessageAc.text.toString()
-                if (sendChatText.isNotBlank()) {
-                    chatViewModel.sendMessage(sendChatText)
-                    binding.etMessageAc.text.clear()
-                }
+        binding.fabSendAc.setOnClickListener {
+            val sendChatText = binding.etMessageAc.text.toString()
+            if (sendChatText.isNotBlank()) {
+                chatViewModel.sendMessage(sendChatText)
+                binding.etMessageAc.text.clear()
             }
+        }
 
 
     }

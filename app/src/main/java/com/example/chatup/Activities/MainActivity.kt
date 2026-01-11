@@ -9,7 +9,7 @@ import com.example.chatup.fragments.ProfileFragment
 import com.example.chatup.fragments.UsersFragment
 
 class MainActivity : AppCompatActivity() {
-    
+
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

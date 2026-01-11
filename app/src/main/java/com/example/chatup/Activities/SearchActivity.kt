@@ -47,7 +47,8 @@ class SearchActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
+        val toggle =
+            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         toggle.drawerArrowDrawable.color = Color.WHITE
@@ -59,7 +60,7 @@ class SearchActivity : AppCompatActivity() {
         setupDrawer()
 
         recycler.layoutManager = LinearLayoutManager(this)
-        
+
         adapter = UserAdapter(emptyList()) { user ->
             val intent = Intent(this, ChatActivity::class.java)
             intent.putExtra("userId", user.uid)
@@ -68,7 +69,7 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
 
-        userViewModel.users.observe(this) { 
+        userViewModel.users.observe(this) {
             adapter.update(it)
         }
 
@@ -87,9 +88,10 @@ class SearchActivity : AppCompatActivity() {
                     val intent = Intent(this, StartMenuActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     startActivity(intent)
-                    finish() 
+                    finish()
                     true
                 }
+
                 R.id.menu_users -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     val intent = Intent(this, StartMenuActivity::class.java)
@@ -98,16 +100,19 @@ class SearchActivity : AppCompatActivity() {
                     finish()
                     true
                 }
+
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     // Redan på söksidan
                     true
                 }
+
                 R.id.menu_settings -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
+
                 R.id.menu_logout -> {
                     authViewModel.signOut()
                     val intent = Intent(this, LoginActivity::class.java)
@@ -115,12 +120,14 @@ class SearchActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-                 R.id.menu_profile -> {
+
+                R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, ProfileActivity::class.java))
                     finish()
                     true
                 }
+
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true

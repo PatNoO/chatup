@@ -74,7 +74,7 @@ class GroupChatViewModel : ViewModel() {
             conversationId = conversationId,
             onUpdate = { messages ->
                 _groupChatMessage.postValue(messages)
-            },chatIsOpened = {isGroupChatOpened()}
+            }, chatIsOpened = { isGroupChatOpened() }
         )
 
     }
@@ -91,7 +91,7 @@ class GroupChatViewModel : ViewModel() {
                 _usersMap.postValue(map)
             },
             onException = { e ->
-                Log.e( e.message, "Error loading users")
+                Log.e(e.message, "Error loading users")
             }
         )
     }
@@ -116,6 +116,7 @@ class GroupChatViewModel : ViewModel() {
         )
 
     }
+
     /**
      * Clears Firebase listeners when ViewModel is destroyed.
      */

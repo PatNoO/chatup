@@ -28,7 +28,7 @@ class StartMenuActivity : AppCompatActivity() {
 
     // ============== UI components ==============
 
-    private lateinit var binding : StartMenuActivityBinding
+    private lateinit var binding: StartMenuActivityBinding
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
@@ -52,7 +52,8 @@ class StartMenuActivity : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawerLayout)
         navigationView = findViewById(R.id.navigationView)
 
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
+        val toggle =
+            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         toggle.drawerArrowDrawable.color = Color.WHITE
@@ -92,16 +93,19 @@ class StartMenuActivity : AppCompatActivity() {
                     showUsers()
                     true
                 }
+
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SearchActivity::class.java))
                     true
                 }
+
                 R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
+
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true

@@ -53,16 +53,17 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
         adapter = ArrayAdapter(
             this,
             R.layout.simple_list_item_multiple_choice,
-            friendList.map { it.username}
+            friendList.map { it.username }
         )
         binding.lvUsersListAfl.adapter = adapter
 
     }
+
     /**
      * Sets up the logic to track which users are selected for the group chat.
      * Selected users are stored in list.
      */
-    private fun selectUsersForGroupChat()  {
+    private fun selectUsersForGroupChat() {
 
         val selectedUser = mutableListOf<User>()
 
@@ -96,15 +97,20 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
             val groupName = binding.etChooseUserAfl.text.toString().trim()
 
             if (binding.etChooseUserAfl.text.isBlank()) {
-                Toast.makeText(this,
-                    getString(com.example.chatup.R.string.choose_a_group_name), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(com.example.chatup.R.string.choose_a_group_name), Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
 
             }
 
             if (selectedUsers.size < 2) {
-                Toast.makeText(this,
-                    getString(com.example.chatup.R.string.choose_2_users_for_group_chat), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(com.example.chatup.R.string.choose_2_users_for_group_chat),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -124,6 +130,7 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
 
         }
     }
+
     /**
      * Loads all users/friends from Firestore via the UsersViewModel and updates the ListView.
      */
