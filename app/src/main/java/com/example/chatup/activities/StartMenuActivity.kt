@@ -17,18 +17,18 @@ import com.example.chatup.viewmodel.ChatViewModel
 import com.google.android.material.navigation.NavigationView
 import android.widget.TextView
 import androidx.core.view.GravityCompat
-import com.example.chatup.Activities.SettingsActivity
-import com.example.chatup.Activities.LoginActivity
-import com.example.chatup.Activities.ProfileActivity
-import com.example.chatup.Activities.SearchActivity
-import com.example.chatup.Activities.FriendListActivity
+import com.example.chatup.activities.SettingsActivity
+import com.example.chatup.activities.LoginActivity
+import com.example.chatup.activities.ProfileActivity
+import com.example.chatup.activities.SearchActivity
+import com.example.chatup.activities.ChooseGroupMembersActivity
 import com.example.chatup.databinding.StartMenuActivityBinding
 
 class StartMenuActivity : AppCompatActivity() {
 
     // ============== UI components ==============
 
-    private lateinit var binding : StartMenuActivityBinding
+    private lateinit var binding: StartMenuActivityBinding
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
@@ -97,16 +97,19 @@ class StartMenuActivity : AppCompatActivity() {
                     showUsers()
                     true
                 }
+
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SearchActivity::class.java))
                     true
                 }
+
                 R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
+
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true
@@ -116,7 +119,7 @@ class StartMenuActivity : AppCompatActivity() {
 
         // ============== Start group chat ==============
         binding.btnGroupChat.setOnClickListener {
-            val intent = Intent(this, FriendListActivity::class.java)
+            val intent = Intent(this, ChooseGroupMembersActivity::class.java)
             startActivity(intent)
         }
     }

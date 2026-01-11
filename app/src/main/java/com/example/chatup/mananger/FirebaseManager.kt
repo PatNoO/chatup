@@ -1,4 +1,4 @@
-package com.example.chatup.Mananger
+package com.example.chatup.mananger
 
 import android.util.Log
 import com.example.chatup.data.ChatMessage
@@ -11,6 +11,11 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
 import kotlin.collections.get
 
+/**
+ * Singleton object for managing all Firebase operations.
+ * Handles sending/receiving messages, group chats, typing status,
+ * marking messages delivered/seen, and user fetching.
+ */
 object FirebaseManager {
 
     /**
@@ -24,10 +29,15 @@ object FirebaseManager {
      */
     private lateinit var currentUser: FirebaseUser
 
-    fun markPrivateChatDelivered ()  {
-        val currentUserId = Firebase.auth.currentUser?.uid ?: return
+    /**
+     * Listens for private messages that need to be marked as delivered.
+     *
+     * @return ListenerRegistration? A Firestore listener for updates, null if user not authenticated.
+     */
+    fun markPrivateChatDelivered(): ListenerRegistration? {
+        val currentUserId = Firebase.auth.currentUser?.uid ?: return null
 
-        db.collection("conversation")
+        return db.collection("conversation")
             .whereArrayContains("users", currentUserId)
             .addSnapshotListener { conversations, e ->
                 if (e != null) {
@@ -44,7 +54,7 @@ object FirebaseManager {
                         .whereEqualTo("receiverId", currentUserId)
                         .whereEqualTo("delivered", false)
                         .get()
-                        .addOnSuccessListener{ messages ->
+                        .addOnSuccessListener { messages ->
 
                             messages?.documents?.forEach { msg ->
                                 msg.reference.update("delivered", true)
@@ -56,10 +66,13 @@ object FirebaseManager {
                                     }
                                 val lastMessageId = conversationDoc.getString("lastMessageId")
 
-                                if (msg.id == lastMessageId){
+                                if (msg.id == lastMessageId) {
                                     conversationDoc.reference.update(
-                                        mapOf ("lastMessageDelivered" to true,
-                                            "lastUpdated" to System.currentTimeMillis()))
+                                        mapOf(
+                                            "lastMessageDelivered" to true,
+                                            "lastUpdated" to System.currentTimeMillis()
+                                        )
+                                    )
                                 }
                             }
                         }
@@ -68,63 +81,13 @@ object FirebaseManager {
 
     }
 
-    fun markMessageSeen ( conversationId: String  ,chatIsOpened : () -> Boolean) {
 
-        val currentUserId = Firebase.auth.currentUser?.uid ?: return
-
-        Log.e("!!!", "Failed to open check mark seen in firebase")
-
-        Log.d("IS_OPEN VALUE 3", "$chatIsOpened")
-
-
-        db.collection("conversation")
-            .document(conversationId)
-            .collection("messages")
-            .orderBy("timeStamp")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.e("!!!", e.message.toString())
-                    return@addSnapshotListener
-                }
-
-                if (snapshot == null) return@addSnapshotListener
-
-
-                snapshot.documents.forEach {doc ->
-                    val message = doc.toObject(ChatMessage::class.java) ?: return@forEach
-
-                    if (message.receiverId == currentUserId
-                        && message.delivered
-                        && !message.seen &&
-                        chatIsOpened()) {
-
-                        doc.reference.update("seen", true)
-                    }
-
-                }
-
-                val lastDoc = snapshot.documents.lastOrNull() ?: return@addSnapshotListener
-                val lastMessage = lastDoc.toObject(ChatMessage::class.java) ?: return@addSnapshotListener
-
-
-                if (lastMessage.receiverId == currentUserId
-                    && lastMessage.delivered && !lastMessage.seen
-                    && chatIsOpened()) {
-
-                    lastDoc.reference.update("seen", true)
-
-                    db.collection("conversation")
-                        .document(conversationId)
-                        .update(
-                            mapOf ("lastMessageSeen" to true,
-                                "lastUpdated" to System.currentTimeMillis()))
-                }
-
-            }
-    }
-
-
-    // todo lägg till komentarer
+    /**
+     * Updates typing status for the current user in a specific conversation.
+     *
+     * @param conversationId The ID of the conversation document.
+     * @param isTyping True if the user is currently typing, false otherwise.
+     */
     fun setTyping(conversationId: String, isTyping: Boolean) {
         val currentUserId = Firebase.auth.currentUser?.uid ?: return
 
@@ -133,8 +96,15 @@ object FirebaseManager {
             .update("typing.$currentUserId", isTyping)
     }
 
-    // todo lägg till komentarer
-
+    /**
+     * Sets up a snapshot listener for the typing status of a friend.
+     *
+     * @param conversationId The ID of the conversation.
+     * @param friendId The UID of the friend whose typing status to listen to.
+     * @param onTyping Callback invoked whenever the typing status changes.
+     *                 Returns true if the friend is typing, false otherwise.
+     * @return ListenerRegistration The Firestore listener registration.
+     */
     fun typingSnapShotListener(
         conversationId: String,
         friendId: String,
@@ -159,19 +129,15 @@ object FirebaseManager {
 
 
     /**
-     * Fetches all users from the Firestore 'users' collection.
-     * This function is used to display a list of all users for starting new conversations.
+     * Fetches all users from Firestore 'users' collection excluding the current user.
      *
-     * @param onComplete Callback invoked when the list of users has been successfully fetched.
-     *                   Returns a List<User> containing all users in the database.
-     * @param onException Callback invoked if there is an error while fetching users.
-     *                    Returns the Exception for logging or UI handling.
+     * @param onComplete Callback invoked with a list of users on success.
+     * @param onException Callback invoked with an Exception on failure.
      */
     fun getAllUsers(onComplete: (List<User>) -> Unit, onException: (Exception) -> Unit) {
 
         val currentUserId = Firebase.auth.currentUser?.uid
 
-        Log.d("FirebaseManager", "Fetching users from Firestore. CurrentUserId=$currentUserId")
 
         db.collection("users")
             .get()
@@ -180,13 +146,11 @@ object FirebaseManager {
                     val user = doc.toObject(User::class.java)?.copy(uid = doc.id)
                     if (user?.uid != currentUserId) user else null
                 }
-                Log.d("FirebaseManager", "Fetched users: ${userList.map { it.username }}")
 
                 onComplete(userList)
 
             }.addOnFailureListener { e ->
                 Log.e("FirebaseManager", "Failed to fetch users", e)
-
                 onException(e)
             }
     }
@@ -194,14 +158,14 @@ object FirebaseManager {
     /**
      * Sets up a real-time listener for messages in a specific conversation.
      *
-     * @param conversationId The Firestore document ID representing the conversation.
-     *                       Used to locate the correct subcollection of messages.
-     * @param onUpdate Callback invoked whenever messages are added, modified, or removed
-     *                 in this conversation. Returns a List<ChatMessage> representing the current messages.
+     * @param conversationId Firestore document ID of the conversation.
+     * @param onUpdate Callback invoked whenever messages change. Returns a list of ChatMessage.
+     * @param chatIsOpened Function returning true if the chat is currently open.
+     * @return ListenerRegistration? Firestore listener registration, null if user not authenticated.
      */
     fun snapShotListener(
         conversationId: String,
-        onUpdate: (List<ChatMessage>) -> Unit, chatIsOpened : () -> Boolean
+        onUpdate: (List<ChatMessage>) -> Unit, chatIsOpened: () -> Boolean
     ): ListenerRegistration? {
 
 
@@ -227,13 +191,14 @@ object FirebaseManager {
                 }
                 onUpdate(chatMessages)
 
-                snapshot.documents.forEach {doc ->
+                snapshot.documents.forEach { doc ->
                     val message = doc.toObject(ChatMessage::class.java) ?: return@forEach
 
                     if (message.receiverId == currentUserId
                         && message.delivered
                         && !message.seen &&
-                        chatIsOpened()) {
+                        chatIsOpened()
+                    ) {
 
                         doc.reference.update("seen", true)
                     }
@@ -241,25 +206,28 @@ object FirebaseManager {
                 }
 
                 val lastDoc = snapshot.documents.lastOrNull() ?: return@addSnapshotListener
-                val lastMessage = lastDoc.toObject(ChatMessage::class.java) ?: return@addSnapshotListener
+                val lastMessage =
+                    lastDoc.toObject(ChatMessage::class.java) ?: return@addSnapshotListener
 
 
                 if (lastMessage.receiverId == currentUserId
                     && lastMessage.delivered && !lastMessage.seen
-                    && chatIsOpened()) {
+                    && chatIsOpened()
+                ) {
 
                     lastDoc.reference.update("seen", true)
 
                     db.collection("conversation")
                         .document(conversationId)
                         .update(
-                            mapOf ("lastMessageSeen" to true,
-                                "lastUpdated" to System.currentTimeMillis()))
+                            mapOf(
+                                "lastMessageSeen" to true,
+                                "lastUpdated" to System.currentTimeMillis()
+                            )
+                        )
                 }
 
             }
-
-
 
 
     }
@@ -298,31 +266,37 @@ object FirebaseManager {
 
         chatMessageRef.set(chatMessage)
             .addOnSuccessListener {
-                Log.d("MSG_SEND", "Message sent id=${chatMessageRef.id}")
 
-
-        // Update or create conversation metadata
-        db.collection("conversation")
-            .document(conversationId)
-            .set(
-                mapOf(
-                    "users" to listOf(currentUser.uid, receiverId),
-                    "lastMessage" to chatText,
-                    "lastUpdated" to System.currentTimeMillis(),
-                    "lastMessageId" to chatMessageRef.id,
-                    "lastMessageDelivered" to false,
-                    "lastMessageSeen" to false
-                ),
-                SetOptions.merge()
-            )
+                // Update or create conversation metadata
+                db.collection("conversation")
+                    .document(conversationId)
+                    .set(
+                        mapOf(
+                            "users" to listOf(currentUser.uid, receiverId),
+                            "lastMessage" to chatText,
+                            "lastUpdated" to System.currentTimeMillis(),
+                            "lastMessageId" to chatMessageRef.id,
+                            "lastMessageDelivered" to false,
+                            "lastMessageSeen" to false
+                        ),
+                        SetOptions.merge()
+                    )
 
             }.addOnFailureListener {
                 Log.d(
                     "CONV_UPDATE",
-                    "Conversation updated: delivered=false, seen=false, sender=${currentUser.uid}")
+                    "Conversation updated: delivered=false, seen=false, sender=${currentUser.uid}"
+                )
             }
     }
 
+    /**
+     * Sends a message to a group chat.
+     *
+     * @param conversationId Firestore conversation document ID.
+     * @param chatText The message content.
+     * @param members List of member UIDs in the group.
+     */
     fun sendGroupMessage(conversationId: String, chatText: String, members: List<String>) {
         val currentUserId = Firebase.auth.currentUser?.uid ?: return
 
@@ -352,13 +326,7 @@ object FirebaseManager {
                     "lastMessageSeen" to false,
                     "lastUpdated" to System.currentTimeMillis()
                 )
-            ).addOnSuccessListener { Log.d("DEBUG_GROUP_MSG", "Conversation updated successfully") }
-            .addOnFailureListener { e ->
-                Log.e(
-                    "DEBUG_GROUP_MSG",
-                    "Failed to update conversation: ${e.message}"
-                )
-            }
+            )
 
     }
 
@@ -369,12 +337,18 @@ object FirebaseManager {
      *
      * @param user1Id the first user ID
      * @param user2Id the second user ID
+     * @return String The unique conversation ID.
      */
     fun getConversationId(user1Id: String, user2Id: String): String {
         return listOf(user1Id, user2Id).sorted().joinToString("_")
     }
 
-    // todo lägg till komentarer
+    /**
+     * Generates a conversation ID for the current user and another user.
+     *
+     * @param user2Id The other user's UID.
+     * @return String The unique conversation ID, or empty if user not authenticated.
+     */
     fun createConversationId(user2Id: String): String {
         currentUser = Firebase.auth.currentUser ?: return ""
         val user1Id: String = currentUser.uid
@@ -382,7 +356,13 @@ object FirebaseManager {
     }
 
 
-
+    /**
+     * Creates a new group conversation in Firestore.
+     *
+     * @param groupName The name of the group.
+     * @param members List of member UIDs.
+     * @param onComplete Callback returning the created conversation ID.
+     */
     fun createGroupConversation(
         groupName: String,
         members: List<String>,
@@ -406,7 +386,6 @@ object FirebaseManager {
         db.collection("conversation")
             .add(groupConversation)
             .addOnSuccessListener { doc ->
-                Log.d("DEBUG_GROUP_MSG", "Group created with id=${doc.id} and name=$groupName")
 
                 onComplete(doc.id)
             }.addOnFailureListener { e ->

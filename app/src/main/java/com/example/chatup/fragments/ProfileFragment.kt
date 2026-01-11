@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.chatup.R
-import com.example.chatup.Activities.MainActivity
+import com.example.chatup.activities.MainActivity
 import com.example.chatup.viewmodel.ProfileViewModel
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -26,7 +26,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val etUsername = view.findViewById<EditText>(R.id.etUsername)
         val tvEmail = view.findViewById<TextView>(R.id.tvEmail)
         val ivProfileImage = view.findViewById<ImageView>(R.id.ivProfileImage)
-        val etProfileImageUrl = view.findViewById<EditText>(R.id.etProfileImageUrl) 
+        val etProfileImageUrl = view.findViewById<EditText>(R.id.etProfileImageUrl)
         val btnSave = view.findViewById<Button>(R.id.btnSaveProfile)
         val btnChats = view.findViewById<Button>(R.id.btnChats)
         val btnUsers = view.findViewById<Button>(R.id.btnUsers)
@@ -51,16 +51,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             val newImageUrl = etProfileImageUrl.text.toString()
 
             if (newUsername.isNotBlank()) {
-                profileViewModel.updateUserProfile(newUsername, if (newImageUrl.isNotBlank()) newImageUrl else null)
-                Toast.makeText(requireContext(),
-                    getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
-                
-                 if (newImageUrl.isNotBlank()) {
+                profileViewModel.updateUserProfile(
+                    newUsername,
+                    if (newImageUrl.isNotBlank()) newImageUrl else null
+                )
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.profile_updated), Toast.LENGTH_SHORT
+                ).show()
+
+                if (newImageUrl.isNotBlank()) {
                     Glide.with(this).load(newImageUrl).into(ivProfileImage)
                 }
             } else {
-                Toast.makeText(requireContext(),
-                    getString(R.string.username_empty), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.username_empty), Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -69,7 +76,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         btnChats.setOnClickListener {
             (activity as? MainActivity)?.replaceFragment(ConversationListFragment())
         }
-        
+
         btnUsers.setOnClickListener {
             (activity as? MainActivity)?.replaceFragment(UsersFragment())
         }

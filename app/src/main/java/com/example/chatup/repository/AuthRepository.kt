@@ -25,8 +25,7 @@ class AuthRepository {
                     return@addOnCompleteListener
                 }
 
-                val uid = task.result.user?.uid ?:
-                return@addOnCompleteListener
+                val uid = task.result.user?.uid ?: return@addOnCompleteListener
 
                 val user = hashMapOf(
                     "uid" to uid,
@@ -48,13 +47,13 @@ class AuthRepository {
     fun sendPasswordReset(
         email: String,
         onResult: (Boolean, String?) -> Unit
-    ){
+    ) {
         auth.setLanguageCode("sv")
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onResult(true, null)
-                }else {
+                } else {
                     onResult(false, task.exception?.message)
                 }
             }

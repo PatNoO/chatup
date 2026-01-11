@@ -9,7 +9,8 @@ import com.example.chatup.data.ChatMessage
 import com.example.chatup.databinding.ItemConversationListLayoutBinding
 import com.example.chatup.data.ConversationList
 
-class ConversationsRecViewAdapter : RecyclerView.Adapter<ConversationsRecViewAdapter.ConversationsViewHolder>() {
+class ConversationsRecViewAdapter :
+    RecyclerView.Adapter<ConversationsRecViewAdapter.ConversationsViewHolder>() {
 
 
     private var conversationsList: List<ConversationList> = emptyList()
@@ -18,7 +19,11 @@ class ConversationsRecViewAdapter : RecyclerView.Adapter<ConversationsRecViewAda
         parent: ViewGroup,
         viewType: Int
     ): ConversationsViewHolder {
-        val binding = ItemConversationListLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val binding = ItemConversationListLayoutBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return ConversationsViewHolder(binding)
     }
 
@@ -35,5 +40,6 @@ class ConversationsRecViewAdapter : RecyclerView.Adapter<ConversationsRecViewAda
         return conversationsList.size
     }
 
-    inner class ConversationsViewHolder (val binding : ItemConversationListLayoutBinding ) : RecyclerView.ViewHolder (binding.root)
+    inner class ConversationsViewHolder(val binding: ItemConversationListLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

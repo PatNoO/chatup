@@ -1,6 +1,5 @@
 package com.example.chatup.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -16,7 +15,8 @@ class ConversationListAdapter(
     RecyclerView.Adapter<ConversationListAdapter.ConversationListViewHolder>() {
 
     // ============== ViewHolder reference for layouts ==============
-    inner class ConversationListViewHolder (val binding : ItemConversationListLayoutBinding) : RecyclerView.ViewHolder (binding.root)
+    inner class ConversationListViewHolder(val binding: ItemConversationListLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     // ============== Create ViewHolder and inflates layout ==============
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationListViewHolder {

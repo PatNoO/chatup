@@ -17,8 +17,9 @@ import kotlinx.coroutines.launch
 
 class ConversationListViewModel : ViewModel() {
 
+
     // ============== Variables for Firestore and Auth ==============
-    private var conversationListener : ListenerRegistration? = null
+    private var conversationListener: ListenerRegistration? = null
     private val db = Firebase.firestore
     private val auth = Firebase.auth
 
@@ -27,7 +28,7 @@ class ConversationListViewModel : ViewModel() {
     val conversationList: LiveData<List<ConversationList>> = _conversationList
 
     // ============== Functions to get all users ==============
-    fun getAllCurrentUserConversationLists(){
+    fun getAllCurrentUserConversationLists() {
         val currentUserId = auth.currentUser?.uid ?: return
 
         conversationListener?.remove()
@@ -39,6 +40,7 @@ class ConversationListViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
+
                 viewModelScope.launch {
                     val users = getUsers()
 
@@ -49,6 +51,8 @@ class ConversationListViewModel : ViewModel() {
 
                         if (!usersInConversation.contains(currentUserId)) return@mapNotNull null
 
+
+                        // Default value from Firestore
                         val lastMessage = doc.getString("lastMessage") ?: ""
                         val lastMessageSeen = doc.getBoolean("lastMessageSeen") ?: false
                         val lastMessageDelivered = doc.getBoolean("lastMessageDelivered") ?: false
@@ -80,7 +84,7 @@ class ConversationListViewModel : ViewModel() {
     }
 
     // ============= Gets all users except the current one ==============
-    private suspend fun getUsers(): List<User>{
+    private suspend fun getUsers(): List<User> {
         val currentUserId = auth.currentUser?.uid
 
         val usersSnapshot = db.collection("users").get().await()
@@ -88,6 +92,10 @@ class ConversationListViewModel : ViewModel() {
             val user = doc.toObject(User::class.java)?.copy(uid = doc.id)
             if (user?.uid != currentUserId) user else null
         }
+
         return users
     }
+
+
+
 }

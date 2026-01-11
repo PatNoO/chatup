@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.chatup.Mananger.FirebaseManager
+import com.example.chatup.mananger.FirebaseManager
 import com.example.chatup.data.User
 
 class UsersViewModel : ViewModel() {
@@ -41,10 +41,10 @@ class UsersViewModel : ViewModel() {
     }
 
     // =============== Create a new group conversation ==============
-    fun createGroup (
-        groupName : String,
-        members : List<String>,
-        onComplete : (String) -> Unit
+    fun createGroup(
+        groupName: String,
+        members: List<String>,
+        onComplete: (String) -> Unit
     ) {
         FirebaseManager.createGroupConversation(
             groupName = groupName,

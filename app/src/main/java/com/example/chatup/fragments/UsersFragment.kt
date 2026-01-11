@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
-import com.example.chatup.Activities.ChatActivity
+import com.example.chatup.activities.ChatActivity
 import com.example.chatup.adapters.UserAdapter
 import com.example.chatup.viewmodel.UsersViewModel
 

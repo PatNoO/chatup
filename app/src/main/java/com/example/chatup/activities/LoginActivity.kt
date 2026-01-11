@@ -1,4 +1,4 @@
-package com.example.chatup.Activities
+package com.example.chatup.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -100,10 +100,11 @@ class LoginActivity : AppCompatActivity() {
 
                 val result = credentialManager.getCredential(
                     this@LoginActivity,
-                    request)
+                    request
+                )
 
                 handleSignIn(result)
-            } catch (e: GetCredentialException){
+            } catch (e: GetCredentialException) {
                 handleFailure(e)
             }
         }
@@ -112,55 +113,60 @@ class LoginActivity : AppCompatActivity() {
     // ============== Handle successful Google login ===============
     private fun handleSignIn(result: GetCredentialResponse) {
 
-        if(result.credential is CustomCredential && result.credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL){
+        if (result.credential is CustomCredential && result.credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
 
             val idToken = googleIdTokenCredential.idToken
 
-            authViewModel.loginWithGoogle(idToken,
+            authViewModel.loginWithGoogle(
+                idToken,
                 {
                     val intent = Intent(this, StartMenuActivity::class.java)
                     startActivity(intent)
-                },{
-                    Toast.makeText(this,"Error: ${it.message}", Toast.LENGTH_SHORT).show()
+                }, {
+                    Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
                 })
         }
     }
 
     // =============== Handle login failure ==============
-    private fun handleFailure(e: GetCredentialException){
-        when(e){
+    private fun handleFailure(e: GetCredentialException) {
+        when (e) {
             is GetCredentialCancellationException -> {
                 Toast.makeText(this, getString(R.string.login_canceled), Toast.LENGTH_SHORT).show()
             }
+
             is NoCredentialException -> {
-                Toast.makeText(this, getString(R.string.no_google_accounts), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.no_google_accounts), Toast.LENGTH_SHORT)
+                    .show()
             }
+
             else -> {
-                Toast.makeText(this, getString(R.string.error, e.message), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error, e.message), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
 
     // ============== Clearing and validation functions ==============
-    fun clearFields(){
+    fun clearFields() {
         binding.etPasswordAl.text.clear()
         binding.etEmailAl.text.clear()
         binding.etForgotEmailAl.text.clear()
     }
 
-    fun checkValidInput(): Boolean{
+    fun checkValidInput(): Boolean {
         var check = true
 
-        if (binding.etPasswordAl.text.isBlank()){
+        if (binding.etPasswordAl.text.isBlank()) {
             check = false
             Toast.makeText(this, getString(R.string.etPasswordAlBlank), Toast.LENGTH_SHORT).show()
         }
-        if (binding.etEmailAl.text.isBlank()){
+        if (binding.etEmailAl.text.isBlank()) {
             check = false
             Toast.makeText(this, getString(R.string.etEmailAlBlank), Toast.LENGTH_SHORT).show()
         }
-        if (binding.etPasswordAl.text.length < 6){
+        if (binding.etPasswordAl.text.length < 6) {
             check = false
             Toast.makeText(this, getString(R.string.etPasswordAlToShort), Toast.LENGTH_SHORT).show()
         }
@@ -188,11 +194,11 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.etPasswordAl.text.toString()
 
         authViewModel.register(email, password) {
-            if (it.isSuccessful){
+            if (it.isSuccessful) {
                 clearFields()
                 val intent = Intent(this, StartMenuActivity::class.java)
                 startActivity(intent)
-            }else {
+            } else {
                 Toast.makeText(this, it.exception?.message.toString(), Toast.LENGTH_SHORT).show()
 
             }

@@ -1,7 +1,6 @@
 package com.example.chatup.adapters
 
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -16,11 +15,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * RecyclerView adapter for displaying chat messages.
+ * Supports both private and group chats.
+ */
 class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var isGroupChat = false
     var chatPartnerName: String? = ""
-    var usersMap : Map<String, String?> = emptyMap()
+    var usersMap: Map<String, String?> = emptyMap()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     var chatList = emptyList<ChatMessage>()
 
@@ -30,6 +33,7 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
+        // Determine if message is sent by current user
         return if (chatList[position].senderId == currentUserId) {
             VIEW_TYPE_SENT
         } else {
@@ -55,6 +59,12 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
+    /**
+     * Formats a timestamp (milliseconds) into a readable string.
+     *
+     * @param timeStamp Timestamp in milliseconds.
+     * @return Formatted date string like "dd/MM HH:mm".
+     */
     fun formatTimeStamp(timeStamp: Long): String {
         val timeStampFormatter = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
         timeStampFormatter.timeZone = java.util.TimeZone.getDefault()
@@ -62,25 +72,40 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return timeStampFormatter.format(dateFormat)
     }
 
-    fun setChatUsers (isGroup : Boolean,  chatPartner: String? = null, users : List<User>? = null ) {
+    /**
+     * Initializes chat users for the adapter.
+     *
+     * @param isGroup True if this is a group chat.
+     * @param chatPartner Name of the private chat partner (optional for private chats).
+     * @param users List of users in the group (optional for group chats).
+     */
+    fun setChatUsers(isGroup: Boolean, chatPartner: String? = null, users: List<User>? = null) {
 
         isGroupChat = isGroup
 
         if (isGroup && users != null) {
             usersMap = users.associate { it.uid to it.username }
-        }else if (!isGroup && chatPartnerName != null ) {
+        } else if (!isGroup && chatPartnerName != null) {
             chatPartnerName = chatPartner
         }
     }
 
+    /**
+     * Updates the users map for group chat dynamically.
+     *
+     * @param newUsersMap Map of user IDs to usernames.
+     */
     fun updateUsersMap(newUsersMap: Map<String, String?>) {
-        Log.d("DEBUG_ADAPTER!!", "setUsersMap called with $newUsersMap")
         usersMap = newUsersMap
         notifyDataSetChanged()
     }
 
+    /**
+     * Submits a new list of chat messages to the adapter.
+     *
+     * @param chatMessages List of ChatMessage objects.
+     */
     fun submitList(chatMessages: List<ChatMessage>) {
-        Log.d("DEBUG_UI_ADAPTER", "submitList called with ${chatMessages.size} messages")
         chatList = chatMessages
         notifyDataSetChanged()
     }
@@ -100,17 +125,7 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.binding.ivCheckDeliveredIms.isVisible = false
 
 
-//            val otherUsersDeliveredTo = chatListMessage.deliveredTo.filter { it != chatListMessage.senderId }
-//
-//            val otherUsersSeenBy = chatListMessage.seenBy.filter { it != chatListMessage.senderId }
-//
-//
-//            val isSeen = otherUsersDeliveredTo.isNotEmpty() && otherUsersDeliveredTo.all { otherUsersSeenBy.contains(it) }
-
-
-//            val isDelivered = otherUsersDeliveredTo.isNotEmpty() && !isSeen
-
-            if (!isGroupChat){
+            if (!isGroupChat) {
                 when {
                     chatListMessage.seen -> {
                         holder.binding.ivCheckDeliveredIms.setImageResource(R.drawable.seen_outline_check_small_24)
@@ -119,12 +134,14 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                         holder.binding.ivCheckDeliveredIms.isVisible = true
 
                     }
+
                     chatListMessage.delivered -> {
                         holder.binding.ivCheckDeliveredIms.setImageResource(R.drawable.outline_check_small_24)
                         holder.binding.ivCheckSentIms.setImageResource(R.drawable.outline_check_small_24)
                         holder.binding.ivCheckDeliveredIms.isVisible = true
                         holder.binding.ivCheckSentIms.isVisible = true
                     }
+
                     else -> {
                         holder.binding.ivCheckSentIms.setImageResource(R.drawable.outline_check_small_24)
                         holder.binding.ivCheckSentIms.isVisible = true
@@ -137,12 +154,10 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.binding.tvTimeStampImr.text = formatTimeStamp(chatListMessage.timeStamp)
 
 
-                val senderName = if (isGroupChat) usersMap[chatListMessage.senderId] else chatPartnerName
-                Log.d("DEBUG_ADAPTER", "Position $position senderId=${chatListMessage.senderId} -> name=$senderName")
-            if (senderName == null) {
-                Log.d("DEBUG_ADAPTER", "Position $position senderId=${chatListMessage.senderId} -> name=null, using fallback")
-            }
-                holder.binding.tvFriendNameImr.text = senderName ?: "unknown"
+            val senderName =
+                if (isGroupChat) usersMap[chatListMessage.senderId] else chatPartnerName
+
+            holder.binding.tvFriendNameImr.text = senderName ?: "unknown"
 
         }
     }
@@ -151,9 +166,11 @@ class ChatRecViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return chatList.size
     }
 
+    /** ViewHolder for received messages. */
     inner class MessageReceivedViewHolder(val binding: ItemMessageReceivedBinding) :
         RecyclerView.ViewHolder(binding.root)
 
+    /** ViewHolder for sent messages. */
     inner class MessageSentViewHolder(val binding: ItemMessageSentBinding) :
         RecyclerView.ViewHolder(binding.root)
 }
