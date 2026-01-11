@@ -20,7 +20,10 @@
     <string name="profile">Profil</string>
     <string name="settings">Inställningar</string>
     <string name="log_out">Logga ut</string>
-    <string name="start_chatting_with">Starta Chat med...</string>
+    <string name="start_chatting_with">Starta Chatt med...</string>
     <string name="conversations">Konversationer</string>
+    <string name="select_group_members">Välj medlemmar till gruppen</string>
+    <string name="group_name">Gruppnamn</string>
+    <string name="start_group_chat">Starta gruppchatt</string>
 
 </resources>

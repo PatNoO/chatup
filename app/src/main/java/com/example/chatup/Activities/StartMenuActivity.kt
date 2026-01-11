@@ -113,12 +113,6 @@ class StartMenuActivity : AppCompatActivity() {
                 }
             }
         }
-
-        // ============== Start group chat ==============
-        binding.btnGroupChat.setOnClickListener {
-            val intent = Intent(this, FriendListActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     // ============== Show fragments with conversations ==============

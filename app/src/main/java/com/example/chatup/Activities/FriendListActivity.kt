@@ -37,6 +37,10 @@ class FriendListActivity : AppCompatActivity() {
         loadUsers()
         initAdapter()
         selectUsersForGroupChat()
+
+        binding.btnBackAfl.setOnClickListener {
+            finish()
+        }
     }
 
     private fun initAdapter() {

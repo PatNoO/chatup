@@ -14,12 +14,12 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="70dp"
+            app:title=" "
             android:background="@color/mid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="ChatUp"
             app:titleTextColor="@color/white">
 
             <ImageView
@@ -27,7 +27,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/icon_green_with_text" />
+                android:src="@drawable/icon_green_with_text"/>
         </androidx.appcompat.widget.Toolbar>
 
         <TextView
@@ -78,18 +78,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <Button
-            android:id="@+id/btn_group_chat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Croup Chat"
-            android:backgroundTint="@color/mid"
-            app:layout_constraintBottom_toBottomOf="@+id/toolbar"
-            app:layout_constraintEnd_toEndOf="@+id/toolbar"
-            app:layout_constraintHorizontal_bias="0.945"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.727" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

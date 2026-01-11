@@ -74,10 +74,10 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="4dp"
         android:backgroundTint="@color/transparent"
-        android:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@id/toolbar_ac"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="?attr/homeAsUpIndicator" />
+        app:srcCompat="?attr/homeAsUpIndicator"
+        app:tint="@color/white" />
 
     <ImageView
         android:id="@+id/imageView2"

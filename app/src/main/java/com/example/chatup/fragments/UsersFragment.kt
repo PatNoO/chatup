@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
 import com.example.chatup.Activities.ChatActivity
+import com.example.chatup.Activities.FriendListActivity
 import com.example.chatup.adapters.UserAdapter
 import com.example.chatup.viewmodel.UsersViewModel
 
@@ -28,6 +29,15 @@ class UsersFragment : Fragment(R.layout.fragment_users_list) {
         val recycler = view.findViewById<RecyclerView>(R.id.usersRecycler)
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
+
+
+        // ============== Start group chat ==============
+        val btnGroupChat = view.findViewById<View>(R.id.btn_group_chat)
+
+        btnGroupChat.setOnClickListener {
+            val intent = Intent(requireContext(), FriendListActivity::class.java)
+            startActivity(intent)
+        }
 
         // =============== Create adapter and handle user click ==============
         adapter = UserAdapter(emptyList()) { user ->
