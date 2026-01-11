@@ -1,11 +1,10 @@
-package com.example.chatup.Activities
+package com.example.chatup.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.chatup.R
 import com.example.chatup.databinding.ActivityMainBinding
-import com.example.chatup.fragments.ProfileFragment
 import com.example.chatup.fragments.UsersFragment
 
 class MainActivity : AppCompatActivity() {

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.chatup.Mananger.FirebaseManager
+import com.example.chatup.mananger.FirebaseManager
 import com.example.chatup.data.ChatMessage
 import com.google.firebase.firestore.ListenerRegistration
 

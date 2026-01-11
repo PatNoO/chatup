@@ -1,4 +1,4 @@
-package com.example.chatup.Mananger
+package com.example.chatup.mananger
 
 import android.util.Log
 import com.example.chatup.data.ChatMessage

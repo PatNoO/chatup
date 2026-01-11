@@ -1,4 +1,4 @@
-package com.example.chatup.Activities
+package com.example.chatup.activities
 
 import android.content.Intent
 import android.graphics.Color
