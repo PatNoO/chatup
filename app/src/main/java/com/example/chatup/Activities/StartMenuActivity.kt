@@ -21,7 +21,7 @@ import com.example.chatup.Activities.SettingsActivity
 import com.example.chatup.Activities.LoginActivity
 import com.example.chatup.Activities.ProfileActivity
 import com.example.chatup.Activities.SearchActivity
-import com.example.chatup.Activities.FriendListActivity
+import com.example.chatup.Activities.ChooseGroupMembersActivity
 import com.example.chatup.databinding.StartMenuActivityBinding
 
 class StartMenuActivity : AppCompatActivity() {
@@ -110,7 +110,7 @@ class StartMenuActivity : AppCompatActivity() {
         }
 
         binding.btnGroupChat.setOnClickListener {
-            val intent = Intent(this, FriendListActivity::class.java)
+            val intent = Intent(this, ChooseGroupMembersActivity::class.java)
             startActivity(intent)
         }
     }

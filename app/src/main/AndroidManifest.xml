@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatup">
         <activity
-            android:name=".Activities.FriendListActivity"
+            android:name=".Activities.ChooseGroupMembersActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.ChatActivity"
