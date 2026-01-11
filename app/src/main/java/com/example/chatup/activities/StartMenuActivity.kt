@@ -28,7 +28,7 @@ class StartMenuActivity : AppCompatActivity() {
 
     // ============== UI components ==============
 
-    private lateinit var binding: StartMenuActivityBinding
+    private lateinit var binding : StartMenuActivityBinding
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
@@ -115,12 +115,6 @@ class StartMenuActivity : AppCompatActivity() {
                     true
                 }
             }
-        }
-
-        // ============== Start group chat ==============
-        binding.btnGroupChat.setOnClickListener {
-            val intent = Intent(this, ChooseGroupMembersActivity::class.java)
-            startActivity(intent)
         }
     }
 

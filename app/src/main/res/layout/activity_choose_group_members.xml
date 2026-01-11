@@ -3,22 +3,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cream_white"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_afl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/mid"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 
     <TextView
         android:id="@+id/tv_header_afl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="Friend List"
+        android:fontFamily="@font/lunasima"
+        android:text="@string/select_group_members"
         android:textAlignment="center"
-        android:textSize="22dp"
+        android:textColor="@color/cream_white"
+        android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar_afl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btn_back_afl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="4dp"
+        android:backgroundTint="@color/transparent"
+        app:layout_constraintBottom_toBottomOf="@id/toolbar_afl"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="?attr/homeAsUpIndicator"
+        app:tint="@color/white" />
 
 
     <ListView
@@ -30,7 +56,8 @@
         app:layout_constraintBottom_toTopOf="@+id/et_choose_user_afl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_header_afl" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_header_afl"
+        android:scrollbars="vertical"/>
 
     <EditText
         android:id="@+id/et_choose_user_afl"
@@ -40,25 +67,22 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:ems="10"
-        android:hint="..."
+        android:hint="@string/group_name"
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fab_start_group_chat_afl"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/fab_start_group_chat_afl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
-        android:src="@drawable/outline_send_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/et_choose_user_afl" />
-
-
-
+        app:layout_constraintTop_toTopOf="@+id/et_choose_user_afl"
+        app:srcCompat="@drawable/logo_green_no_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
