@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
 import com.example.chatup.activities.ChatActivity
+import com.example.chatup.activities.ChooseGroupMembersActivity
 import com.example.chatup.adapters.UserAdapter
 import com.example.chatup.viewmodel.UsersViewModel
 
@@ -21,6 +22,14 @@ class UsersFragment : Fragment(R.layout.fragment_users_list) {
     // ============== Starts when fragment view creats ================
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // ============== Start group chat ==============
+        val btnGroupChat = view.findViewById<View>(R.id.btn_group_chat)
+
+        btnGroupChat.setOnClickListener {
+            val intent = Intent(requireContext(), ChooseGroupMembersActivity::class.java)
+            startActivity(intent)
+        }
 
         // ============= Initilize ViewModel, find RecyclerView and set layout manager ==============
         userViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
