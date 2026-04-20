@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
@@ -17,8 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class UsersFragment : Fragment(R.layout.fragment_users_list) {
 
-    // ============== ViewModel and Adapter ==============
-    private lateinit var userViewModel: UsersViewModel
+    private val userViewModel: UsersViewModel by viewModels()
     private lateinit var adapter: UserAdapter
 
     // ============== Starts when fragment view creats ================
@@ -34,7 +33,6 @@ class UsersFragment : Fragment(R.layout.fragment_users_list) {
         }
 
         // ============= Initilize ViewModel, find RecyclerView and set layout manager ==============
-        userViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
         val recycler = view.findViewById<RecyclerView>(R.id.usersRecycler)
 

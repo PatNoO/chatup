@@ -12,6 +12,8 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun getCurrentUserId(): String? = authDataSource.getCurrentUser()?.uid
 
+    override fun getCurrentUserEmail(): String? = authDataSource.getCurrentUser()?.email
+
     override fun signOut() = authDataSource.signOut()
 
     override suspend fun login(email: String, password: String): Result<Unit> =

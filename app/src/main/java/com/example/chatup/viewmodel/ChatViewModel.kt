@@ -3,26 +3,25 @@ package com.example.chatup.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.chatup.data.ChatMessage
-import com.example.chatup.data.User
-import com.example.chatup.data.source.ChatDataSource
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.firestore
+import com.example.chatup.domain.repository.ChatRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val chatRepository: ChatRepository
+) : ViewModel() {
 
-    // Temporary manual wiring — replaced by @HiltViewModel @Inject in CU-5
-    private val chatDataSource by lazy { ChatDataSource(Firebase.auth, Firebase.firestore) }
-
-    private var checkDeliveredListener: ListenerRegistration? = null
-    private var chatListener: ListenerRegistration? = null
-    private var typingListener: ListenerRegistration? = null
+    private var messagesJob: Job? = null
+    private var typingJob: Job? = null
 
     private var conversationId: String = ""
 
-    private val _chatOpened = MutableLiveData<Boolean>()
+    private val _chatOpened = MutableLiveData(false)
 
     private val _isTyping = MutableLiveData<Boolean>()
     val isTyping: LiveData<Boolean> get() = _isTyping
@@ -35,9 +34,6 @@ class ChatViewModel : ViewModel() {
     private val _chatMessage = MutableLiveData<List<ChatMessage>>()
     val chatMessage: LiveData<List<ChatMessage>> get() = _chatMessage
 
-    private val _users = MutableLiveData<List<User>>()
-    val users: LiveData<List<User>> get() = _users
-
     fun setOtherUserName(otherUserName: String?) {
         _otherUserName.value = otherUserName ?: ""
     }
@@ -47,50 +43,58 @@ class ChatViewModel : ViewModel() {
     }
 
     fun setChatOpened(isOpened: Boolean) {
-        _chatOpened.postValue(isOpened)
+        _chatOpened.value = isOpened
+        if (isOpened && conversationId.isNotEmpty()) {
+            chatRepository.markMessagesSeen(conversationId)
+        }
     }
 
     fun isChatOpened(): Boolean = _chatOpened.value == true
 
     fun setTyping(isTyping: Boolean) {
-        chatDataSource.setTyping(conversationId, isTyping)
+        if (conversationId.isNotEmpty()) {
+            chatRepository.setTyping(conversationId, isTyping)
+        }
     }
 
     fun initChat(otherUserId: String) {
         _otherUserId.value = otherUserId
-        conversationId = chatDataSource.createConversationId(otherUserId)
+        conversationId = chatRepository.createConversationId(otherUserId)
 
-        chatListener?.remove()
-        chatListener = chatDataSource.observeMessages(
-            conversationId = conversationId,
-            onUpdate = { messages -> _chatMessage.postValue(messages.toList()) },
-            chatIsOpened = { isChatOpened() }
-        )
+        messagesJob?.cancel()
+        messagesJob = viewModelScope.launch {
+            chatRepository.observeMessages(conversationId).collect { messages ->
+                _chatMessage.postValue(messages)
+                if (isChatOpened()) {
+                    chatRepository.markMessagesSeen(conversationId)
+                }
+            }
+        }
 
-        typingListener?.remove()
-        typingListener = chatDataSource.typingSnapshotListener(
-            conversationId = conversationId,
-            friendId = otherUserId
-        ) { typing -> _isTyping.value = typing }
+        typingJob?.cancel()
+        typingJob = viewModelScope.launch {
+            chatRepository.observeTyping(conversationId, otherUserId).collect { typing ->
+                _isTyping.postValue(typing)
+            }
+        }
     }
 
     fun sendMessage(chatText: String) {
         val receiverId = _otherUserId.value ?: return
-        chatDataSource.sendMessage(chatText, receiverId)
+        viewModelScope.launch {
+            chatRepository.sendMessage(chatText, receiverId)
+        }
     }
 
     fun checkDeliveredMessage() {
-        checkDeliveredListener?.remove()
-        checkDeliveredListener = chatDataSource.markPrivateChatDelivered()
+        viewModelScope.launch {
+            chatRepository.markPrivateChatDelivered()
+        }
     }
 
     override fun onCleared() {
+        messagesJob?.cancel()
+        typingJob?.cancel()
         super.onCleared()
-        chatListener?.remove()
-        chatListener = null
-        typingListener?.remove()
-        typingListener = null
-        checkDeliveredListener?.remove()
-        checkDeliveredListener = null
     }
 }

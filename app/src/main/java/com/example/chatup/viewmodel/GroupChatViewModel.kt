@@ -4,28 +4,27 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.chatup.data.ChatMessage
-import com.example.chatup.data.source.ChatDataSource
-import com.example.chatup.data.source.GroupChatDataSource
-import com.example.chatup.data.source.UserDataSource
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.firestore
+import com.example.chatup.domain.repository.GroupChatRepository
+import com.example.chatup.domain.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GroupChatViewModel : ViewModel() {
+@HiltViewModel
+class GroupChatViewModel @Inject constructor(
+    private val groupChatRepository: GroupChatRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
-    // Temporary manual wiring — replaced by @HiltViewModel @Inject in CU-5
-    private val chatDataSource by lazy { ChatDataSource(Firebase.auth, Firebase.firestore) }
-    private val groupChatDataSource by lazy { GroupChatDataSource(Firebase.auth, Firebase.firestore) }
-    private val userDataSource by lazy { UserDataSource(Firebase.auth, Firebase.firestore) }
-
-    private var chatListener: ListenerRegistration? = null
+    private var messagesJob: Job? = null
 
     private lateinit var conversationId: String
     private lateinit var groupMembers: List<String>
 
-    private val _chatIsOpened = MutableLiveData<Boolean>()
+    private val _chatIsOpened = MutableLiveData(false)
 
     private val _usersMap = MutableLiveData<Map<String, String>>(emptyMap())
     val usersMap: LiveData<Map<String, String>> get() = _usersMap
@@ -37,8 +36,6 @@ class GroupChatViewModel : ViewModel() {
         _chatIsOpened.value = isOpened
     }
 
-    private fun isGroupChatOpened(): Boolean = _chatIsOpened.value == true
-
     fun initGroupChat(convId: String?, members: List<String>) {
         if (convId == null) {
             Log.e("GroupChatViewModel", "initGroupChat: convId is null")
@@ -49,21 +46,23 @@ class GroupChatViewModel : ViewModel() {
 
         loadUsersMap()
 
-        chatListener?.remove()
-        chatListener = chatDataSource.observeMessages(
-            conversationId = conversationId,
-            onUpdate = { messages -> _groupChatMessage.postValue(messages) },
-            chatIsOpened = { isGroupChatOpened() }
-        )
+        messagesJob?.cancel()
+        messagesJob = viewModelScope.launch {
+            groupChatRepository.observeGroupMessages(conversationId).collect { messages ->
+                _groupChatMessage.postValue(messages)
+            }
+        }
     }
 
     private fun loadUsersMap() {
-        userDataSource.getAllUsers(
-            onComplete = { users ->
+        viewModelScope.launch {
+            try {
+                val users = userRepository.getUsers()
                 _usersMap.postValue(users.associate { it.uid to (it.username ?: "") })
-            },
-            onException = { e -> Log.e("GroupChatViewModel", "Error loading users: ${e.message}") }
-        )
+            } catch (e: Exception) {
+                Log.e("GroupChatViewModel", "Error loading users: ${e.message}")
+            }
+        }
     }
 
     fun sendGroupMessage(chatText: String) {
@@ -71,12 +70,13 @@ class GroupChatViewModel : ViewModel() {
             Log.e("GroupChatViewModel", "ViewModel not initialized")
             return
         }
-        groupChatDataSource.sendGroupMessage(conversationId, chatText, groupMembers)
+        viewModelScope.launch {
+            groupChatRepository.sendGroupMessage(conversationId, chatText, groupMembers)
+        }
     }
 
     override fun onCleared() {
-        chatListener?.remove()
-        chatListener = null
+        messagesJob?.cancel()
         super.onCleared()
     }
 }

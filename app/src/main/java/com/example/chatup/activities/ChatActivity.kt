@@ -2,16 +2,15 @@ package com.example.chatup.activities
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chatup.R
 import com.example.chatup.adapters.ChatRecViewAdapter
 import com.example.chatup.databinding.ActivityChatBinding
 import com.example.chatup.viewmodel.ChatViewModel
 import com.example.chatup.viewmodel.GroupChatViewModel
-import com.example.chatup.viewmodel.UsersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -22,21 +21,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
-    private lateinit var usersViewModel: UsersViewModel
-
-    private lateinit var groupChatViewModel: GroupChatViewModel
-
-    private lateinit var chatViewModel: ChatViewModel
-
+    private val chatViewModel: ChatViewModel by viewModels()
+    private val groupChatViewModel: GroupChatViewModel by viewModels()
     private lateinit var adapter: ChatRecViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
-        groupChatViewModel = ViewModelProvider(this)[GroupChatViewModel::class.java]
-        usersViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
         adapter = ChatRecViewAdapter()
 

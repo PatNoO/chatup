@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.chatup.R
 import com.example.chatup.activities.MainActivity
@@ -18,12 +18,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
-    private lateinit var profileViewModel: ProfileViewModel
+    private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
         val etUsername = view.findViewById<EditText>(R.id.etUsername)
         val tvEmail = view.findViewById<TextView>(R.id.tvEmail)

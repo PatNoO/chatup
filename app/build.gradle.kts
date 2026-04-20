@@ -64,6 +64,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
