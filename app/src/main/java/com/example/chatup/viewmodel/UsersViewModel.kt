@@ -4,52 +4,46 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.chatup.mananger.FirebaseManager
 import com.example.chatup.data.User
+import com.example.chatup.data.source.GroupChatDataSource
+import com.example.chatup.data.source.UserDataSource
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class UsersViewModel : ViewModel() {
 
-    // ============== Livedata ==============
+    // Temporary manual wiring — replaced by @HiltViewModel @Inject in CU-5
+    private val userDataSource by lazy { UserDataSource(Firebase.auth, Firebase.firestore) }
+    private val groupChatDataSource by lazy { GroupChatDataSource(Firebase.auth, Firebase.firestore) }
+
     private val _users = MutableLiveData<List<User>>()
     val users: LiveData<List<User>> = _users
 
-    // ============== Data ==================
     private var originalUserList = listOf<User>()
 
-    // ============== Fetch users ===========
     fun getAllUsers() {
-        FirebaseManager.getAllUsers({ userList ->
-            originalUserList = userList
-            _users.value = userList
-        }, { e ->
-            Log.e("!!!", e.message.toString())
-        })
+        userDataSource.getAllUsers(
+            onComplete = { userList ->
+                originalUserList = userList
+                _users.value = userList
+            },
+            onException = { e -> Log.e("UsersViewModel", e.message.toString()) }
+        )
     }
 
-    // ============== Search users by email och username ==============
     fun searchUsers(query: String) {
         if (query.isBlank()) {
             _users.value = originalUserList
         } else {
-            val filteredList = originalUserList.filter { user ->
-                val usernameMatch = user.username?.contains(query, ignoreCase = true) == true
-                val emailMatch = user.email.contains(query, ignoreCase = true)
-                usernameMatch || emailMatch
+            _users.value = originalUserList.filter { user ->
+                user.username?.contains(query, ignoreCase = true) == true
+                        || user.email.contains(query, ignoreCase = true)
             }
-            _users.value = filteredList
         }
     }
 
-    // =============== Create a new group conversation ==============
-    fun createGroup(
-        groupName: String,
-        members: List<String>,
-        onComplete: (String) -> Unit
-    ) {
-        FirebaseManager.createGroupConversation(
-            groupName = groupName,
-            members = members,
-            onComplete = onComplete
-        )
+    fun createGroup(groupName: String, members: List<String>, onComplete: (String) -> Unit) {
+        groupChatDataSource.createGroupConversation(groupName, members, onComplete)
     }
 }
