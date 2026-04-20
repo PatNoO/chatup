@@ -5,7 +5,6 @@ import com.example.chatup.domain.repository.AuthRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// Stub implementation — coroutine-wrapped methods completed in CU-4
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource
@@ -15,11 +14,15 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun signOut() = authDataSource.signOut()
 
-    override suspend fun login(email: String, password: String): Result<Unit> = TODO("Implemented in CU-4")
+    override suspend fun login(email: String, password: String): Result<Unit> =
+        authDataSource.loginSuspend(email, password)
 
-    override suspend fun loginWithGoogle(idToken: String): Result<Unit> = TODO("Implemented in CU-4")
+    override suspend fun loginWithGoogle(idToken: String): Result<Unit> =
+        authDataSource.loginWithGoogleSuspend(idToken)
 
-    override suspend fun register(email: String, password: String): Result<Unit> = TODO("Implemented in CU-4")
+    override suspend fun register(email: String, password: String): Result<Unit> =
+        authDataSource.registerSuspend(email, password)
 
-    override suspend fun sendPasswordReset(email: String): Result<String> = TODO("Implemented in CU-4")
+    override suspend fun sendPasswordReset(email: String): Result<String> =
+        authDataSource.sendPasswordResetSuspend(email)
 }

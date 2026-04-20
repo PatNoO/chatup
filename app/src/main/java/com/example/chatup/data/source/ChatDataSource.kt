@@ -6,6 +6,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -123,6 +127,102 @@ class ChatDataSource @Inject constructor(
                 ),
                 SetOptions.merge()
             )
+        }
+    }
+
+    fun observeMessagesFlow(conversationId: String): Flow<List<ChatMessage>> = callbackFlow {
+        val registration = db.collection("conversation").document(conversationId)
+            .collection("messages").orderBy("timeStamp")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) { close(e); return@addSnapshotListener }
+                val messages = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(ChatMessage::class.java)?.apply { id = doc.id }
+                } ?: emptyList()
+                trySend(messages)
+            }
+        awaitClose { registration.remove() }
+    }
+
+    fun observeTypingFlow(conversationId: String, friendId: String): Flow<Boolean> = callbackFlow {
+        val registration = db.collection("conversation").document(conversationId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) { close(e); return@addSnapshotListener }
+                val typing = snapshot?.get("typing") as? Map<*, *>
+                trySend(typing?.get(friendId) as? Boolean ?: false)
+            }
+        awaitClose { registration.remove() }
+    }
+
+    suspend fun sendMessageSuspend(chatText: String, receiverId: String) {
+        val currentUser = auth.currentUser ?: return
+        val conversationId = getConversationId(currentUser.uid, receiverId)
+        val messageRef = db.collection("conversation")
+            .document(conversationId)
+            .collection("messages")
+            .document()
+
+        val message = ChatMessage(
+            id = messageRef.id,
+            senderId = currentUser.uid,
+            receiverId = receiverId,
+            messages = chatText,
+            timeStamp = System.currentTimeMillis(),
+            delivered = false,
+            seen = false
+        )
+
+        messageRef.set(message).await()
+        db.collection("conversation").document(conversationId).set(
+            mapOf(
+                "users" to listOf(currentUser.uid, receiverId),
+                "lastMessage" to chatText,
+                "lastUpdated" to System.currentTimeMillis(),
+                "lastMessageId" to messageRef.id,
+                "lastMessageDelivered" to false,
+                "lastMessageSeen" to false
+            ),
+            SetOptions.merge()
+        ).await()
+    }
+
+    fun markMessagesSeen(conversationId: String) {
+        val currentUserId = auth.currentUser?.uid ?: return
+        db.collection("conversation").document(conversationId)
+            .collection("messages")
+            .whereEqualTo("receiverId", currentUserId)
+            .whereEqualTo("delivered", true)
+            .whereEqualTo("seen", false)
+            .get()
+            .addOnSuccessListener { messages ->
+                messages.documents.forEach { doc -> doc.reference.update("seen", true) }
+                db.collection("conversation").document(conversationId).update(
+                    mapOf("lastMessageSeen" to true, "lastUpdated" to System.currentTimeMillis())
+                )
+            }
+    }
+
+    suspend fun markPrivateChatDeliveredSuspend() {
+        val currentUserId = auth.currentUser?.uid ?: return
+        val conversations = db.collection("conversation")
+            .whereArrayContains("users", currentUserId)
+            .get().await()
+
+        conversations.documents.forEach { conversationDoc ->
+            val undelivered = db.collection("conversation").document(conversationDoc.id)
+                .collection("messages")
+                .whereEqualTo("receiverId", currentUserId)
+                .whereEqualTo("delivered", false)
+                .get().await()
+
+            val lastMessageId = conversationDoc.getString("lastMessageId")
+            undelivered.documents.forEach { msg ->
+                msg.reference.update("delivered", true)
+                if (msg.id == lastMessageId) {
+                    conversationDoc.reference.update(
+                        mapOf("lastMessageDelivered" to true, "lastUpdated" to System.currentTimeMillis())
+                    )
+                }
+            }
         }
     }
 

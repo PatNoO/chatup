@@ -63,4 +63,15 @@ class UserDataSource @Inject constructor(
         db.collection("users").document(uid).update(updates)
             .addOnSuccessListener { onSuccess() }
     }
+
+    suspend fun loadProfileSuspend(uid: String): User? {
+        val document = db.collection("users").document(uid).get().await()
+        return if (document.exists()) document.toObject(User::class.java)?.copy(uid = uid) else null
+    }
+
+    suspend fun updateProfileSuspend(uid: String, username: String, profileImageUrl: String?) {
+        val updates = hashMapOf<String, Any>("username" to username)
+        if (profileImageUrl != null) updates["profileImage"] = profileImageUrl
+        db.collection("users").document(uid).update(updates).await()
+    }
 }
