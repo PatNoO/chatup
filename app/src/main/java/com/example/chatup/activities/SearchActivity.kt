@@ -20,9 +20,11 @@ import com.example.chatup.adapters.UserAdapter
 import com.example.chatup.viewmodel.AuthViewModel
 import com.example.chatup.viewmodel.UsersViewModel
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.jvm.java
 import kotlin.toString
 
+@AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var userViewModel: UsersViewModel

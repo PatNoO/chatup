@@ -12,11 +12,13 @@ import com.example.chatup.databinding.ActivityChatBinding
 import com.example.chatup.viewmodel.ChatViewModel
 import com.example.chatup.viewmodel.GroupChatViewModel
 import com.example.chatup.viewmodel.UsersViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * ChatActivity handles both private and group chat conversations.
  * It initializes the UI, sets up ViewModels, and observes chat-related LiveData.
  */
+@AndroidEntryPoint
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding

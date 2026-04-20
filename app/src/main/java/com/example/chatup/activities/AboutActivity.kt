@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.chatup.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AboutActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

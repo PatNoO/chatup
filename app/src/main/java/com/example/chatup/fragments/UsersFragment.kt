@@ -12,7 +12,9 @@ import com.example.chatup.activities.ChatActivity
 import com.example.chatup.activities.ChooseGroupMembersActivity
 import com.example.chatup.adapters.UserAdapter
 import com.example.chatup.viewmodel.UsersViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UsersFragment : Fragment(R.layout.fragment_users_list) {
 
     // ============== ViewModel and Adapter ==============
