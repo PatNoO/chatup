@@ -1,6 +1,6 @@
 package com.example.chatup.domain.repository
 
-import com.example.chatup.data.ConversationList
+import com.example.chatup.data.model.ConversationList
 import kotlinx.coroutines.flow.Flow
 
 interface ConversationRepository {

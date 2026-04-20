@@ -16,52 +16,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatup">
         <activity
-            android:name=".activities.ChooseGroupMembersActivity"
+            android:name=".ui.group.ChooseGroupMembersActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ChatActivity"
+            android:name=".ui.chat.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.AboutActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".activities.TermsActivity"
+            android:name=".ui.settings.AboutActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ProfileActivity"
+            android:name=".ui.settings.TermsActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SearchActivity"
+            android:name=".ui.profile.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".StartMenuActivity"
+            android:name=".ui.search.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".ui.auth.StartMenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
-<!--            android:exported="false">-->
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.MainActivity"
-            android:exported="false">
-
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
+            android:name=".ui.profile.MainActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"

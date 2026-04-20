@@ -1,7 +1,7 @@
 package com.example.chatup.data.source
 
 import android.util.Log
-import com.example.chatup.data.ChatMessage
+import com.example.chatup.data.model.ChatMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration

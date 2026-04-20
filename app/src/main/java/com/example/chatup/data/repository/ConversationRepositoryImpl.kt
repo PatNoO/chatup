@@ -1,7 +1,7 @@
 package com.example.chatup.data.repository
 
 import android.util.Log
-import com.example.chatup.data.ConversationList
+import com.example.chatup.data.model.ConversationList
 import com.example.chatup.data.source.ConversationDataSource
 import com.example.chatup.data.source.UserDataSource
 import com.example.chatup.domain.repository.ConversationRepository

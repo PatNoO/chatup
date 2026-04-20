@@ -1,6 +1,6 @@
 package com.example.chatup.domain.repository
 
-import com.example.chatup.data.User
+import com.example.chatup.data.model.User
 
 interface UserRepository {
     suspend fun getUsers(): List<User>

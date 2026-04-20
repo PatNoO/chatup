@@ -1,6 +1,6 @@
 package com.example.chatup.data.repository
 
-import com.example.chatup.data.User
+import com.example.chatup.data.model.User
 import com.example.chatup.data.source.UserDataSource
 import com.example.chatup.domain.repository.UserRepository
 import javax.inject.Inject
