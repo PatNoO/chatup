@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.CheckedTextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.chatup.activities.ChatActivity
 import com.example.chatup.data.User
 import com.example.chatup.databinding.ActivityChooseGroupMembersBinding
-import com.example.chatup.viewmodel.ChatViewModel
 import com.example.chatup.viewmodel.UsersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,32 +21,31 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class ChooseGroupMembersActivity : AppCompatActivity() {
-    private lateinit var usersViewModel: UsersViewModel
-
+    private val usersViewModel: UsersViewModel by viewModels()
     private lateinit var binding: ActivityChooseGroupMembersBinding
-
-    private lateinit var chatViewModel: ChatViewModel
-
     private lateinit var adapter: ArrayAdapter<String>
-
     private var friendList = mutableListOf<User>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChooseGroupMembersBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
-        usersViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
 
         loadUsers()
-
         initAdapter()
-
         selectUsersForGroupChat()
 
-        binding.btnBackAfl.setOnClickListener {
-            finish()
+        usersViewModel.createGroupResult.observe(this) { conversationId ->
+            if (conversationId != null) {
+                val intent = Intent(this, ChatActivity::class.java)
+                intent.putExtra("conversationId", conversationId)
+                intent.putExtra("isGroup", true)
+                intent.putExtra("groupName", binding.etChooseUserAfl.text.toString().trim())
+                startActivity(intent)
+            }
         }
+
+        binding.btnBackAfl.setOnClickListener { finish() }
     }
 
     /**
@@ -92,41 +90,19 @@ class ChooseGroupMembersActivity : AppCompatActivity() {
      * @param selectedUsers MutableList of User objects selected for the group.
      */
     private fun startGroupChat(selectedUsers: MutableList<User>) {
-
         binding.fabStartGroupChatAfl.setOnClickListener {
-
             val groupName = binding.etChooseUserAfl.text.toString().trim()
 
-            if (binding.etChooseUserAfl.text.isBlank()) {
-                Toast.makeText(
-                    this,
-                    getString(com.example.chatup.R.string.choose_a_group_name), Toast.LENGTH_SHORT
-                ).show()
+            if (groupName.isBlank()) {
+                Toast.makeText(this, getString(com.example.chatup.R.string.choose_a_group_name), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
             if (selectedUsers.size < 2) {
-                Toast.makeText(
-                    this,
-                    getString(com.example.chatup.R.string.choose_2_users_for_group_chat),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, getString(com.example.chatup.R.string.choose_2_users_for_group_chat), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val selectedUserIds = selectedUsers.map { it.uid }
-
-            // Call ViewModel to create the group in Firestore
-            usersViewModel.createGroup(groupName = groupName, selectedUserIds) { conversationId ->
-
-                val intent = Intent(this, ChatActivity::class.java)
-                intent.putExtra("conversationId", conversationId)
-                intent.putExtra("isGroup", true)
-                intent.putExtra("groupName", groupName)
-                intent.putExtra("chatPartnersId", ArrayList(selectedUserIds))
-
-                startActivity(intent)
-            }
+            usersViewModel.createGroup(groupName, selectedUsers.map { it.uid })
         }
     }
 

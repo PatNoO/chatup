@@ -3,6 +3,7 @@ package com.example.chatup.activities
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -11,7 +12,6 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.chatup.R
 import com.example.chatup.StartMenuActivity
@@ -26,63 +26,56 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
-    // ============= Variables for binding and ViewModel =============
-    lateinit var binding: ActivityLoginBinding
-    lateinit var authViewModel: AuthViewModel
-
-    // ============== Variables for credential manager ==============
-    lateinit var credentialManager: CredentialManager
+    private lateinit var binding: ActivityLoginBinding
+    private val authViewModel: AuthViewModel by viewModels()
+    private lateinit var credentialManager: CredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // ============== View binding set up =============
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ============== Initilize ViewModel ==============
-        authViewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
-
-        // ==============Initilize credential manager ==============
         credentialManager = CredentialManager.create(this)
 
-        // ============== Clicklistener ==============
-        binding.btnRegisterAl.setOnClickListener {
-            if (checkValidInput()) {
-                register()
-            }
-        }
-        binding.btnLoginAl.setOnClickListener {
-            if (checkValidInput()) {
-                login()
-            }
-        }
-        binding.btnLogingoogleAl.setOnClickListener {
-            loginWithGoogle()
-        }
-
+        binding.btnRegisterAl.setOnClickListener { if (checkValidInput()) register() }
+        binding.btnLoginAl.setOnClickListener { if (checkValidInput()) login() }
+        binding.btnLogingoogleAl.setOnClickListener { loginWithGoogle() }
         binding.btnForgotPasswordAl.setOnClickListener {
-            val email = binding.etForgotEmailAl.text.toString().trim()
-            authViewModel.resetPassword(email)
+            authViewModel.resetPassword(binding.etForgotEmailAl.text.toString().trim())
         }
 
-        // ============== Observe reset password result =============
+        authViewModel.loginResult.observe(this) { result ->
+            result.onSuccess {
+                clearFields()
+                startActivity(Intent(this, StartMenuActivity::class.java))
+            }.onFailure {
+                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        authViewModel.registerResult.observe(this) { result ->
+            result.onSuccess {
+                clearFields()
+                startActivity(Intent(this, StartMenuActivity::class.java))
+            }.onFailure {
+                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        authViewModel.googleLoginResult.observe(this) { result ->
+            result.onSuccess {
+                startActivity(Intent(this, StartMenuActivity::class.java))
+            }.onFailure {
+                Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         authViewModel.resetPasswordResult.observe(this) { result ->
-            result
-                .onSuccess {
-                    Toast.makeText(
-                        this,
-                        it,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                .onFailure {
-                    Toast.makeText(
-                        this,
-                        it.message ?: getString(R.string.wrong),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            result.onSuccess {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(this, it.message ?: getString(R.string.wrong), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -112,22 +105,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // ============== Handle successful Google login ===============
     private fun handleSignIn(result: GetCredentialResponse) {
-
         if (result.credential is CustomCredential && result.credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
-
-            val idToken = googleIdTokenCredential.idToken
-
-            authViewModel.loginWithGoogle(
-                idToken,
-                {
-                    val intent = Intent(this, StartMenuActivity::class.java)
-                    startActivity(intent)
-                }, {
-                    Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-                })
+            authViewModel.loginWithGoogle(googleIdTokenCredential.idToken)
         }
     }
 
@@ -176,34 +157,17 @@ class LoginActivity : AppCompatActivity() {
         return check
     }
 
-    // ============== Email and password login ==============
-    fun login() {
-        val email = binding.etEmailAl.text.toString()
-        val password = binding.etPasswordAl.text.toString()
-
-        authViewModel.login(email, password, {
-            clearFields()
-            val intent = Intent(this, StartMenuActivity::class.java)
-            startActivity(intent)
-        }, {
-            Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
-        })
+    private fun login() {
+        authViewModel.login(
+            binding.etEmailAl.text.toString(),
+            binding.etPasswordAl.text.toString()
+        )
     }
 
-    // ============== Register with email and password ==============
-    fun register() {
-        val email = binding.etEmailAl.text.toString()
-        val password = binding.etPasswordAl.text.toString()
-
-        authViewModel.register(email, password) {
-            if (it.isSuccessful) {
-                clearFields()
-                val intent = Intent(this, StartMenuActivity::class.java)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, it.exception?.message.toString(), Toast.LENGTH_SHORT).show()
-
-            }
-        }
+    private fun register() {
+        authViewModel.register(
+            binding.etEmailAl.text.toString(),
+            binding.etPasswordAl.text.toString()
+        )
     }
 }

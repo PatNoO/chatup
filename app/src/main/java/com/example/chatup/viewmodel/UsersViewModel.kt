@@ -4,32 +4,38 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.chatup.data.User
-import com.example.chatup.data.source.GroupChatDataSource
-import com.example.chatup.data.source.UserDataSource
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
+import com.example.chatup.domain.repository.GroupChatRepository
+import com.example.chatup.domain.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UsersViewModel : ViewModel() {
-
-    // Temporary manual wiring — replaced by @HiltViewModel @Inject in CU-5
-    private val userDataSource by lazy { UserDataSource(Firebase.auth, Firebase.firestore) }
-    private val groupChatDataSource by lazy { GroupChatDataSource(Firebase.auth, Firebase.firestore) }
+@HiltViewModel
+class UsersViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val groupChatRepository: GroupChatRepository
+) : ViewModel() {
 
     private val _users = MutableLiveData<List<User>>()
     val users: LiveData<List<User>> = _users
 
+    private val _createGroupResult = MutableLiveData<String?>()
+    val createGroupResult: LiveData<String?> = _createGroupResult
+
     private var originalUserList = listOf<User>()
 
     fun getAllUsers() {
-        userDataSource.getAllUsers(
-            onComplete = { userList ->
+        viewModelScope.launch {
+            try {
+                val userList = userRepository.getUsers()
                 originalUserList = userList
-                _users.value = userList
-            },
-            onException = { e -> Log.e("UsersViewModel", e.message.toString()) }
-        )
+                _users.postValue(userList)
+            } catch (e: Exception) {
+                Log.e("UsersViewModel", "Error loading users: ${e.message}")
+            }
+        }
     }
 
     fun searchUsers(query: String) {
@@ -43,7 +49,14 @@ class UsersViewModel : ViewModel() {
         }
     }
 
-    fun createGroup(groupName: String, members: List<String>, onComplete: (String) -> Unit) {
-        groupChatDataSource.createGroupConversation(groupName, members, onComplete)
+    fun createGroup(groupName: String, members: List<String>) {
+        viewModelScope.launch {
+            try {
+                val conversationId = groupChatRepository.createGroupConversation(groupName, members)
+                _createGroupResult.postValue(conversationId)
+            } catch (e: Exception) {
+                Log.e("UsersViewModel", "Error creating group: ${e.message}")
+            }
+        }
     }
 }

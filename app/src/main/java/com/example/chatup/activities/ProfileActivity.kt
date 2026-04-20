@@ -8,12 +8,12 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.chatup.R
 import com.example.chatup.StartMenuActivity
@@ -28,8 +28,8 @@ import kotlin.text.isNullOrEmpty
 @AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
 
-    private lateinit var profileViewModel: ProfileViewModel
-    private lateinit var authViewModel: AuthViewModel
+    private val profileViewModel: ProfileViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
@@ -37,9 +37,6 @@ class ProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
-
-        profileViewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
-        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
         drawerLayout = findViewById(R.id.drawerLayout)
         navigationView = findViewById(R.id.navigationView)
@@ -55,7 +52,7 @@ class ProfileActivity : AppCompatActivity() {
 
         val headerViewHamburgerMenu = navigationView.getHeaderView(0)
         val tvMail = headerViewHamburgerMenu.findViewById<TextView>(R.id.tv_email)
-        tvMail.text = authViewModel.getCurrentUser()?.email ?: getString(R.string.no_email)
+        tvMail.text = authViewModel.getCurrentUserEmail() ?: getString(R.string.no_email)
 
         setupDrawer()
 

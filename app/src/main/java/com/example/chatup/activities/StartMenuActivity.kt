@@ -5,11 +5,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import com.example.chatup.fragments.ConversationListFragment
 import com.example.chatup.fragments.UsersFragment
 import com.example.chatup.viewmodel.AuthViewModel
@@ -35,18 +35,13 @@ class StartMenuActivity : AppCompatActivity() {
     private lateinit var navigationView: NavigationView
     private lateinit var toolbar: Toolbar
 
-    // ============== Viewmodels ==============
-    private lateinit var auth: AuthViewModel
-    private lateinit var chatViewModel: ChatViewModel
+    private val auth: AuthViewModel by viewModels()
+    private val chatViewModel: ChatViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = StartMenuActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // ============== ViewModels =============
-        auth = ViewModelProvider(this)[AuthViewModel::class.java]
-        chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
 
         // ============== Toolbar and navigation setup ==============
         toolbar = findViewById(R.id.toolbar)
@@ -64,7 +59,7 @@ class StartMenuActivity : AppCompatActivity() {
         // ============== Set user email in navigation drawer header =============
         val headerViewHamburgerMenu = navigationView.getHeaderView(0)
         val tvMail = headerViewHamburgerMenu.findViewById<TextView>(R.id.tv_email)
-        tvMail.text = auth.getCurrentUser()?.email ?: getString(R.string.no_email)
+        tvMail.text = auth.getCurrentUserEmail() ?: getString(R.string.no_email)
 
         // ============== Load default fragments ==============
         showConversations()

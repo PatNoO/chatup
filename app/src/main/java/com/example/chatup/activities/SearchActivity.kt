@@ -5,13 +5,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
@@ -27,8 +27,8 @@ import kotlin.toString
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var userViewModel: UsersViewModel
-    private lateinit var authViewModel: AuthViewModel
+    private val userViewModel: UsersViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
     private lateinit var adapter: UserAdapter
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -37,9 +37,6 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
-        userViewModel = ViewModelProvider(this)[UsersViewModel::class.java]
-        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
         drawerLayout = findViewById(R.id.drawerLayout)
         navigationView = findViewById(R.id.navigationView)
@@ -57,7 +54,7 @@ class SearchActivity : AppCompatActivity() {
 
         val headerViewHamburgerMenu = navigationView.getHeaderView(0)
         val tvMail = headerViewHamburgerMenu.findViewById<TextView>(R.id.tv_email)
-        tvMail.text = authViewModel.getCurrentUser()?.email ?: getString(R.string.no_email)
+        tvMail.text = authViewModel.getCurrentUserEmail() ?: getString(R.string.no_email)
 
         setupDrawer()
 
