@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -21,6 +23,11 @@ android {
     }
     buildFeatures{
         viewBinding = true
+    }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+        abortOnError = true
     }
 
     buildTypes {
@@ -55,6 +62,8 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

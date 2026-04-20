@@ -23,7 +23,9 @@ import com.example.chatup.activities.ProfileActivity
 import com.example.chatup.activities.SearchActivity
 import com.example.chatup.activities.ChooseGroupMembersActivity
 import com.example.chatup.databinding.StartMenuActivityBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class StartMenuActivity : AppCompatActivity() {
 
     // ============== UI components ==============

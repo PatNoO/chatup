@@ -13,7 +13,9 @@ import com.bumptech.glide.Glide
 import com.example.chatup.R
 import com.example.chatup.activities.MainActivity
 import com.example.chatup.viewmodel.ProfileViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var profileViewModel: ProfileViewModel

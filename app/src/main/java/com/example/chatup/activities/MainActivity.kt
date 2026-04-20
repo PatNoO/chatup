@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import com.example.chatup.R
 import com.example.chatup.databinding.ActivityMainBinding
 import com.example.chatup.fragments.UsersFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

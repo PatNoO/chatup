@@ -20,10 +20,12 @@ import com.example.chatup.StartMenuActivity
 import com.example.chatup.viewmodel.AuthViewModel
 import com.example.chatup.viewmodel.ProfileViewModel
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.jvm.java
 import kotlin.text.isNotBlank
 import kotlin.text.isNullOrEmpty
 
+@AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var profileViewModel: ProfileViewModel

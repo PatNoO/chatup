@@ -13,7 +13,9 @@ import com.example.chatup.adapters.ConversationListAdapter
 import com.example.chatup.viewmodel.ConversationListViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ConversationListFragment : Fragment(R.layout.fragment_conversation_list) {
 
     // ============== Variables ============

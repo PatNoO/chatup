@@ -13,12 +13,14 @@ import com.example.chatup.data.User
 import com.example.chatup.databinding.ActivityChooseGroupMembersBinding
 import com.example.chatup.viewmodel.ChatViewModel
 import com.example.chatup.viewmodel.UsersViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Activity for selecting users to create a new group chat.
  * Users can choose multiple friends from a ListView.
  * After selection, a group can be created and ChatActivity is started.
  */
+@AndroidEntryPoint
 class ChooseGroupMembersActivity : AppCompatActivity() {
     private lateinit var usersViewModel: UsersViewModel
 
