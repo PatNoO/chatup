@@ -4,48 +4,32 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.chatup.data.User
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.chatup.data.source.UserDataSource
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class ProfileViewModel : ViewModel() {
 
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
+    // Temporary manual wiring — replaced by @HiltViewModel @Inject in CU-5
+    private val userDataSource by lazy { UserDataSource(Firebase.auth, Firebase.firestore) }
 
     private val _currentUser = MutableLiveData<User?>()
     val currentUser: LiveData<User?> = _currentUser
 
     fun loadUserProfile() {
-        val uid = auth.currentUser?.uid
-        if (uid != null) {
-            db.collection("users").document(uid).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val user = document.toObject(User::class.java)?.copy(uid = uid)
-                        _currentUser.value = user
-                    }
-                }
-        }
+        val uid = Firebase.auth.currentUser?.uid ?: return
+        userDataSource.loadProfile(uid) { user -> _currentUser.value = user }
     }
 
     fun updateUserProfile(username: String, profileImageUrl: String?) {
-        val uid = auth.currentUser?.uid
-        if (uid != null) {
-            val updates = hashMapOf<String, Any>(
-                "username" to username
+        val uid = Firebase.auth.currentUser?.uid ?: return
+        userDataSource.updateProfile(uid, username, profileImageUrl) {
+            val updatedUser = _currentUser.value?.copy(
+                username = username,
+                profileImage = profileImageUrl ?: _currentUser.value?.profileImage
             )
-            if (profileImageUrl != null) {
-                updates["profileImage"] = profileImageUrl
-            }
-
-            db.collection("users").document(uid).update(updates)
-                .addOnSuccessListener {
-                    val updatedUser = _currentUser.value?.copy(
-                        username = username,
-                        profileImage = profileImageUrl ?: _currentUser.value?.profileImage
-                    )
-                    _currentUser.value = updatedUser
-                }
+            _currentUser.value = updatedUser
         }
     }
 }
