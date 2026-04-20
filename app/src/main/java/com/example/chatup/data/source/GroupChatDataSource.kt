@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.chatup.data.ChatMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,5 +60,47 @@ class GroupChatDataSource @Inject constructor(
             .addOnFailureListener { e ->
                 Log.e("GroupChatDataSource", "Failed to create group: ${e.message}")
             }
+    }
+
+    suspend fun sendGroupMessageSuspend(conversationId: String, chatText: String) {
+        val currentUserId = auth.currentUser?.uid ?: return
+        val messageRef = db.collection("conversation")
+            .document(conversationId)
+            .collection("messages")
+            .document()
+
+        val message = ChatMessage(
+            id = messageRef.id,
+            senderId = currentUserId,
+            messages = chatText,
+            receiverId = null,
+            timeStamp = System.currentTimeMillis(),
+            delivered = false,
+            seen = false
+        )
+
+        messageRef.set(message).await()
+        db.collection("conversation").document(conversationId).update(
+            mapOf(
+                "lastMessage" to chatText,
+                "lastMessageId" to messageRef.id,
+                "lastMessageSeen" to false,
+                "lastUpdated" to System.currentTimeMillis()
+            )
+        ).await()
+    }
+
+    suspend fun createGroupConversationSuspend(groupName: String, members: List<String>): String {
+        val currentUserId = auth.currentUser?.uid ?: error("User not authenticated")
+        val allMembers = (members + currentUserId).distinct()
+        val groupConversation = mapOf(
+            "conversationType" to "group",
+            "name" to groupName,
+            "users" to allMembers,
+            "lastMessage" to "",
+            "lastUpdated" to System.currentTimeMillis()
+        )
+        val doc = db.collection("conversation").add(groupConversation).await()
+        return doc.id
     }
 }
