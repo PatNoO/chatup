@@ -14,19 +14,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.example.chatup.R
+import com.example.chatup.ui.auth.AuthViewModel
 import com.example.chatup.ui.auth.LoginActivity
 import com.example.chatup.ui.auth.StartMenuActivity
 import com.example.chatup.ui.search.SearchActivity
 import com.example.chatup.ui.settings.SettingsActivity
-import com.example.chatup.ui.auth.AuthViewModel
-import com.example.chatup.ui.profile.ProfileViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.jvm.java
-import kotlin.text.isNotBlank
-import kotlin.text.isNullOrEmpty
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
@@ -47,8 +47,7 @@ class ProfileActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
-        val toggle =
-            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         toggle.drawerArrowDrawable.color = Color.WHITE
@@ -65,17 +64,22 @@ class ProfileActivity : AppCompatActivity() {
         val etProfileImageUrl = findViewById<EditText>(R.id.etProfileImageUrl)
         val btnSave = findViewById<Button>(R.id.btnSaveProfile)
 
-        profileViewModel.currentUser.observe(this) { user ->
-            if (user != null) {
-                etUsername.setText(user.username)
-                tvEmail.text = user.email
-                if (!user.profileImage.isNullOrEmpty()) {
-                    etProfileImageUrl.setText(user.profileImage)
-                    Glide.with(this)
-                        .load(user.profileImage)
-                        .placeholder(android.R.drawable.sym_def_app_icon)
-                        .error(android.R.drawable.sym_def_app_icon)
-                        .into(ivProfileImage)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                profileViewModel.uiState.collect { state ->
+                    if (state is ProfileViewModel.UiState.Success) {
+                        val user = state.user
+                        etUsername.setText(user.username)
+                        tvEmail.text = user.email
+                        if (!user.profileImage.isNullOrEmpty()) {
+                            etProfileImageUrl.setText(user.profileImage)
+                            Glide.with(this@ProfileActivity)
+                                .load(user.profileImage)
+                                .placeholder(android.R.drawable.sym_def_app_icon)
+                                .error(android.R.drawable.sym_def_app_icon)
+                                .into(ivProfileImage)
+                        }
+                    }
                 }
             }
         }
@@ -83,25 +87,17 @@ class ProfileActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             val newUsername = etUsername.text.toString()
             val newImageUrl = etProfileImageUrl.text.toString()
-
             if (newUsername.isNotBlank()) {
                 profileViewModel.updateUserProfile(
                     newUsername,
                     if (newImageUrl.isNotBlank()) newImageUrl else null
                 )
-                Toast.makeText(
-                    this,
-                    getString(R.string.profile_updated), Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(this, getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
                 if (newImageUrl.isNotBlank()) {
                     Glide.with(this).load(newImageUrl).into(ivProfileImage)
                 }
             } else {
-                Toast.makeText(
-                    this,
-                    getString(R.string.username_empty), Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, getString(R.string.username_empty), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -119,7 +115,6 @@ class ProfileActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-
                 R.id.menu_users -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     val intent = Intent(this, StartMenuActivity::class.java)
@@ -128,19 +123,16 @@ class ProfileActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SearchActivity::class.java))
                     true
                 }
-
                 R.id.menu_settings -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
-
                 R.id.menu_logout -> {
                     authViewModel.signOut()
                     val intent = Intent(this, LoginActivity::class.java)
@@ -148,13 +140,10 @@ class ProfileActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-
                 R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                    // Redan på profilsidan
                     true
                 }
-
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true

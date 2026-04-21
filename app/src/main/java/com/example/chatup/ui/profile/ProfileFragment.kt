@@ -9,13 +9,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.example.chatup.R
 import com.example.chatup.ui.conversations.ConversationListFragment
-import com.example.chatup.ui.profile.MainActivity
 import com.example.chatup.ui.search.UsersFragment
-import com.example.chatup.ui.profile.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -33,17 +35,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val btnChats = view.findViewById<Button>(R.id.btnChats)
         val btnUsers = view.findViewById<Button>(R.id.btnUsers)
 
-        profileViewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            if (user != null) {
-                etUsername.setText(user.username)
-                tvEmail.text = user.email
-                if (!user.profileImage.isNullOrEmpty()) {
-                    etProfileImageUrl.setText(user.profileImage)
-                    Glide.with(this)
-                        .load(user.profileImage)
-                        .placeholder(android.R.drawable.sym_def_app_icon)
-                        .error(android.R.drawable.sym_def_app_icon)
-                        .into(ivProfileImage)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                profileViewModel.uiState.collect { state ->
+                    if (state is ProfileViewModel.UiState.Success) {
+                        val user = state.user
+                        etUsername.setText(user.username)
+                        tvEmail.text = user.email
+                        if (!user.profileImage.isNullOrEmpty()) {
+                            etProfileImageUrl.setText(user.profileImage)
+                            Glide.with(this@ProfileFragment)
+                                .load(user.profileImage)
+                                .placeholder(android.R.drawable.sym_def_app_icon)
+                                .error(android.R.drawable.sym_def_app_icon)
+                                .into(ivProfileImage)
+                        }
+                    }
                 }
             }
         }
@@ -51,25 +58,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         btnSave.setOnClickListener {
             val newUsername = etUsername.text.toString()
             val newImageUrl = etProfileImageUrl.text.toString()
-
             if (newUsername.isNotBlank()) {
                 profileViewModel.updateUserProfile(
                     newUsername,
                     if (newImageUrl.isNotBlank()) newImageUrl else null
                 )
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.profile_updated), Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(requireContext(), getString(R.string.profile_updated), Toast.LENGTH_SHORT).show()
                 if (newImageUrl.isNotBlank()) {
                     Glide.with(this).load(newImageUrl).into(ivProfileImage)
                 }
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.username_empty), Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(requireContext(), getString(R.string.username_empty), Toast.LENGTH_SHORT).show()
             }
         }
 
