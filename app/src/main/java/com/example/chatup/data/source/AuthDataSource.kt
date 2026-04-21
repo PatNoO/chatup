@@ -14,10 +14,13 @@ import javax.inject.Singleton
 class AuthDataSource @Inject constructor(
     private val auth: FirebaseAuth,
     private val db: FirebaseFirestore
-) {
+) : AuthDataSourceContract {
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
 
-    fun signOut() = auth.signOut()
+    override fun getCurrentUserId(): String? = auth.currentUser?.uid
+    override fun getCurrentUserEmail(): String? = auth.currentUser?.email
+
+    override fun signOut() = auth.signOut()
 
     fun login(
         email: String,
@@ -75,18 +78,18 @@ class AuthDataSource @Inject constructor(
             }
     }
 
-    suspend fun loginSuspend(email: String, password: String): Result<Unit> = runCatching {
+    override suspend fun loginSuspend(email: String, password: String): Result<Unit> = runCatching {
         auth.signInWithEmailAndPassword(email, password).await()
         Unit
     }
 
-    suspend fun loginWithGoogleSuspend(idToken: String): Result<Unit> = runCatching {
+    override suspend fun loginWithGoogleSuspend(idToken: String): Result<Unit> = runCatching {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential).await()
         Unit
     }
 
-    suspend fun registerSuspend(email: String, password: String): Result<Unit> = runCatching {
+    override suspend fun registerSuspend(email: String, password: String): Result<Unit> = runCatching {
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val uid = result.user?.uid ?: error("UID unavailable after registration")
         val user = hashMapOf(
@@ -98,7 +101,7 @@ class AuthDataSource @Inject constructor(
         Unit
     }
 
-    suspend fun sendPasswordResetSuspend(email: String): Result<String> = runCatching {
+    override suspend fun sendPasswordResetSuspend(email: String): Result<String> = runCatching {
         auth.setLanguageCode("sv")
         auth.sendPasswordResetEmail(email).await()
         email

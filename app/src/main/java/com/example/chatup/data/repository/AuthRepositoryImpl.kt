@@ -1,18 +1,18 @@
 package com.example.chatup.data.repository
 
-import com.example.chatup.data.source.AuthDataSource
+import com.example.chatup.data.source.AuthDataSourceContract
 import com.example.chatup.domain.repository.AuthRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val authDataSource: AuthDataSource
+    private val authDataSource: AuthDataSourceContract
 ) : AuthRepository {
 
-    override fun getCurrentUserId(): String? = authDataSource.getCurrentUser()?.uid
+    override fun getCurrentUserId(): String? = authDataSource.getCurrentUserId()
 
-    override fun getCurrentUserEmail(): String? = authDataSource.getCurrentUser()?.email
+    override fun getCurrentUserEmail(): String? = authDataSource.getCurrentUserEmail()
 
     override fun signOut() = authDataSource.signOut()
 
