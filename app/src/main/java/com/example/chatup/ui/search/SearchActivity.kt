@@ -12,21 +12,22 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatup.R
+import com.example.chatup.ui.adapters.UserAdapter
+import com.example.chatup.ui.auth.AuthViewModel
 import com.example.chatup.ui.auth.LoginActivity
 import com.example.chatup.ui.auth.StartMenuActivity
 import com.example.chatup.ui.chat.ChatActivity
 import com.example.chatup.ui.profile.ProfileActivity
 import com.example.chatup.ui.settings.SettingsActivity
-import com.example.chatup.ui.adapters.UserAdapter
-import com.example.chatup.ui.auth.AuthViewModel
-import com.example.chatup.ui.search.UsersViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.jvm.java
-import kotlin.toString
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
@@ -50,8 +51,7 @@ class SearchActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
-        val toggle =
-            ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         toggle.drawerArrowDrawable.color = Color.WHITE
@@ -63,7 +63,6 @@ class SearchActivity : AppCompatActivity() {
         setupDrawer()
 
         recycler.layoutManager = LinearLayoutManager(this)
-
         adapter = UserAdapter(emptyList()) { user ->
             val intent = Intent(this, ChatActivity::class.java)
             intent.putExtra("userId", user.uid)
@@ -72,8 +71,12 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
 
-        userViewModel.users.observe(this) {
-            adapter.update(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                userViewModel.uiState.collect { state ->
+                    adapter.update(state.users)
+                }
+            }
         }
 
         userViewModel.getAllUsers()
@@ -94,7 +97,6 @@ class SearchActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-
                 R.id.menu_users -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     val intent = Intent(this, StartMenuActivity::class.java)
@@ -103,19 +105,15 @@ class SearchActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-
                 R.id.menu_search -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                    // Redan på söksidan
                     true
                 }
-
                 R.id.menu_settings -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, SettingsActivity::class.java))
                     true
                 }
-
                 R.id.menu_logout -> {
                     authViewModel.signOut()
                     val intent = Intent(this, LoginActivity::class.java)
@@ -123,14 +121,12 @@ class SearchActivity : AppCompatActivity() {
                     startActivity(intent)
                     true
                 }
-
                 R.id.menu_profile -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     startActivity(Intent(this, ProfileActivity::class.java))
                     finish()
                     true
                 }
-
                 else -> {
                     drawerLayout.closeDrawer(GravityCompat.START)
                     true

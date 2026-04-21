@@ -177,7 +177,7 @@ Rules:
 
 ## Pull Request Rules
 
-Target branch is always `main`.
+Target branch is always `dev`. Feature branches merge into `dev`; `dev` is periodically merged into `main`.
 
 **PR Title:**
 ```

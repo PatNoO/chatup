@@ -12,11 +12,11 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.chatup.R
-import com.example.chatup.ui.auth.StartMenuActivity
 import com.example.chatup.databinding.ActivityLoginBinding
-import com.example.chatup.ui.auth.AuthViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
@@ -44,42 +44,32 @@ class LoginActivity : AppCompatActivity() {
             authViewModel.resetPassword(binding.etForgotEmailAl.text.toString().trim())
         }
 
-        authViewModel.loginResult.observe(this) { result ->
-            result.onSuccess {
-                clearFields()
-                startActivity(Intent(this, StartMenuActivity::class.java))
-            }.onFailure {
-                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        authViewModel.registerResult.observe(this) { result ->
-            result.onSuccess {
-                clearFields()
-                startActivity(Intent(this, StartMenuActivity::class.java))
-            }.onFailure {
-                Toast.makeText(this, it.message.toString(), Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        authViewModel.googleLoginResult.observe(this) { result ->
-            result.onSuccess {
-                startActivity(Intent(this, StartMenuActivity::class.java))
-            }.onFailure {
-                Toast.makeText(this, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        authViewModel.resetPasswordResult.observe(this) { result ->
-            result.onSuccess {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-            }.onFailure {
-                Toast.makeText(this, it.message ?: getString(R.string.wrong), Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                authViewModel.uiState.collect { state ->
+                    when (state) {
+                        is AuthViewModel.UiState.LoginSuccess,
+                        is AuthViewModel.UiState.RegisterSuccess,
+                        is AuthViewModel.UiState.GoogleLoginSuccess -> {
+                            clearFields()
+                            authViewModel.resetState()
+                            startActivity(Intent(this@LoginActivity, StartMenuActivity::class.java))
+                        }
+                        is AuthViewModel.UiState.ResetPasswordSuccess -> {
+                            Toast.makeText(this@LoginActivity, state.email, Toast.LENGTH_SHORT).show()
+                            authViewModel.resetState()
+                        }
+                        is AuthViewModel.UiState.Error -> {
+                            Toast.makeText(this@LoginActivity, state.message, Toast.LENGTH_SHORT).show()
+                            authViewModel.resetState()
+                        }
+                        else -> {}
+                    }
+                }
             }
         }
     }
 
-    // ============== Google login ===============
     private fun loginWithGoogle() {
         lifecycleScope.launch {
             try {
@@ -92,12 +82,7 @@ class LoginActivity : AppCompatActivity() {
                     .addCredentialOption(googleIdOption)
                     .build()
 
-
-                val result = credentialManager.getCredential(
-                    this@LoginActivity,
-                    request
-                )
-
+                val result = credentialManager.getCredential(this@LoginActivity, request)
                 handleSignIn(result)
             } catch (e: GetCredentialException) {
                 handleFailure(e)
@@ -112,26 +97,17 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // =============== Handle login failure ==============
     private fun handleFailure(e: GetCredentialException) {
         when (e) {
-            is GetCredentialCancellationException -> {
+            is GetCredentialCancellationException ->
                 Toast.makeText(this, getString(R.string.login_canceled), Toast.LENGTH_SHORT).show()
-            }
-
-            is NoCredentialException -> {
-                Toast.makeText(this, getString(R.string.no_google_accounts), Toast.LENGTH_SHORT)
-                    .show()
-            }
-
-            else -> {
-                Toast.makeText(this, getString(R.string.error, e.message), Toast.LENGTH_SHORT)
-                    .show()
-            }
+            is NoCredentialException ->
+                Toast.makeText(this, getString(R.string.no_google_accounts), Toast.LENGTH_SHORT).show()
+            else ->
+                Toast.makeText(this, getString(R.string.error, e.message), Toast.LENGTH_SHORT).show()
         }
     }
 
-    // ============== Clearing and validation functions ==============
     fun clearFields() {
         binding.etPasswordAl.text.clear()
         binding.etEmailAl.text.clear()
@@ -140,7 +116,6 @@ class LoginActivity : AppCompatActivity() {
 
     fun checkValidInput(): Boolean {
         var check = true
-
         if (binding.etPasswordAl.text.isBlank()) {
             check = false
             Toast.makeText(this, getString(R.string.etPasswordAlBlank), Toast.LENGTH_SHORT).show()
@@ -153,7 +128,6 @@ class LoginActivity : AppCompatActivity() {
             check = false
             Toast.makeText(this, getString(R.string.etPasswordAlToShort), Toast.LENGTH_SHORT).show()
         }
-
         return check
     }
 

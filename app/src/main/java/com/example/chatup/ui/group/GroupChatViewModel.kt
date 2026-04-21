@@ -1,8 +1,6 @@
 package com.example.chatup.ui.group
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatup.data.model.ChatMessage
@@ -10,6 +8,8 @@ import com.example.chatup.domain.repository.GroupChatRepository
 import com.example.chatup.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,22 +19,19 @@ class GroupChatViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private var messagesJob: Job? = null
+    data class UiState(
+        val messages: List<ChatMessage> = emptyList(),
+        val usersMap: Map<String, String> = emptyMap()
+    )
 
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState: StateFlow<UiState> = _uiState
+
+    private var messagesJob: Job? = null
     private lateinit var conversationId: String
     private lateinit var groupMembers: List<String>
 
-    private val _chatIsOpened = MutableLiveData(false)
-
-    private val _usersMap = MutableLiveData<Map<String, String>>(emptyMap())
-    val usersMap: LiveData<Map<String, String>> get() = _usersMap
-
-    private val _groupChatMessage = MutableLiveData<List<ChatMessage>>()
-    val groupChatMessage: LiveData<List<ChatMessage>> get() = _groupChatMessage
-
-    fun setGroupChatOpened(isOpened: Boolean) {
-        _chatIsOpened.value = isOpened
-    }
+    fun setGroupChatOpened(isOpened: Boolean) {}
 
     fun initGroupChat(convId: String?, members: List<String>) {
         if (convId == null) {
@@ -49,7 +46,7 @@ class GroupChatViewModel @Inject constructor(
         messagesJob?.cancel()
         messagesJob = viewModelScope.launch {
             groupChatRepository.observeGroupMessages(conversationId).collect { messages ->
-                _groupChatMessage.postValue(messages)
+                _uiState.value = _uiState.value.copy(messages = messages)
             }
         }
     }
@@ -58,7 +55,9 @@ class GroupChatViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val users = userRepository.getUsers()
-                _usersMap.postValue(users.associate { it.uid to (it.username ?: "") })
+                _uiState.value = _uiState.value.copy(
+                    usersMap = users.associate { it.uid to (it.username ?: "") }
+                )
             } catch (e: Exception) {
                 Log.e("GroupChatViewModel", "Error loading users: ${e.message}")
             }

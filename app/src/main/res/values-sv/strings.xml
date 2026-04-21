@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ChatUp</string>
-    <string name="wrong">Fel uppstod</string>
     <string name="etPasswordAlBlank">lösenordet måste inehålla minst 6 tecken</string>
     <string name="etEmailAlBlank">Uppge en epostadress</string>
     <string name="etPasswordAlToShort">lösenordet måste inehålla minst 6 tecken</string>
