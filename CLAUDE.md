@@ -123,15 +123,26 @@ When done: update status to `done` and reference the branch/PR.
 ## Branch Naming
 
 ```
-chatup/<short-description>
+<type>/<short-description>
 ```
+
+| Type | When |
+|------|------|
+| `feat` | New feature or screen |
+| `fix` | Bug fix |
+| `chore` | Config, deps, build — no src change |
+| `refactor` | Restructure without behaviour change |
+| `docs` | Documentation only |
+| `test` | Tests only |
+| `perf` | Performance improvement |
+| `spike` | Time-boxed investigation |
 
 Examples:
 ```
-chatup/hilt-setup
-chatup/repository-layer
-chatup/flow-migration
-chatup/chat-viewmodel-refactor
+feat/chat-repository
+fix/typing-indicator-memory-leak
+chore/hilt-setup
+refactor/firebase-data-source-split
 ```
 
 ---
@@ -166,7 +177,7 @@ Rules:
 
 ## Pull Request Rules
 
-Target branch is always `main`.
+Target branch is always `dev`. Feature branches merge into `dev`; `dev` is periodically merged into `main`.
 
 **PR Title:**
 ```

@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">ChatUp</string>
     <string name="default_web_client_id">635818144534-jcs167ao26bj4effrv577nlh60a9b6t3.apps.googleusercontent.com</string>
-    <string name="wrong">Something is wrong</string>
     <string name="etPasswordAlBlank">the password must contain at least 6 characters</string>
     <string name="etEmailAlBlank">Enter an email address</string>
     <string name="etPasswordAlToShort">the password must contain at least 6 characters</string>
