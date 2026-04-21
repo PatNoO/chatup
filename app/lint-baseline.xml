@@ -7,7 +7,7 @@
         errorLine1="        NotificationManagerCompat.from(context).notify(1001, notif)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/utils/NotificationHelper.kt.kt"
+            file="src/main/java/com/example/chatup/util/NotificationHelper.kt"
             line="42"
             column="9"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1="import android.R"
         errorLine2="~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/activities/ChooseGroupMembersActivity.kt"
+            file="src/main/java/com/example/chatup/ui/group/ChooseGroupMembersActivity.kt"
             line="3"
             column="1"/>
     </issue>
@@ -1041,7 +1041,7 @@
         errorLine1="        notifyDataSetChanged()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/adapters/ChatRecViewAdapter.kt"
+            file="src/main/java/com/example/chatup/ui/adapters/ChatRecViewAdapter.kt"
             line="100"
             column="9"/>
     </issue>
@@ -1052,7 +1052,7 @@
         errorLine1="        notifyDataSetChanged()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/adapters/ChatRecViewAdapter.kt"
+            file="src/main/java/com/example/chatup/ui/adapters/ChatRecViewAdapter.kt"
             line="110"
             column="9"/>
     </issue>
@@ -1063,7 +1063,7 @@
         errorLine1="        notifyDataSetChanged()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/adapters/ConversationListAdapter.kt"
+            file="src/main/java/com/example/chatup/ui/adapters/ConversationListAdapter.kt"
             line="89"
             column="9"/>
     </issue>
@@ -1074,7 +1074,7 @@
         errorLine1="        notifyDataSetChanged()"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/adapters/UserAdapter.kt"
+            file="src/main/java/com/example/chatup/ui/adapters/UserAdapter.kt"
             line="39"
             column="9"/>
     </issue>
@@ -1096,7 +1096,7 @@
         errorLine1="        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/utils/NotificationHelper.kt.kt"
+            file="src/main/java/com/example/chatup/util/NotificationHelper.kt"
             line="18"
             column="13"/>
     </issue>
@@ -1869,8 +1869,8 @@
         errorLine1="        prefs.edit().putBoolean(KEY_NOTIFICATIONS_ENABLED, enabled).apply()"
         errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/activities/SettingsActivity.kt"
-            line="127"
+            file="src/main/java/com/example/chatup/ui/settings/SettingsActivity.kt"
+            line="128"
             column="9"/>
     </issue>
 
@@ -1880,8 +1880,8 @@
         errorLine1="        prefs.edit().clear().apply()"
         errorLine2="        ~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/activities/SettingsActivity.kt"
-            line="151"
+            file="src/main/java/com/example/chatup/ui/settings/SettingsActivity.kt"
+            line="152"
             column="9"/>
     </issue>
 
@@ -2122,7 +2122,7 @@
         errorLine1="        tvVersion.text = &quot;${getString(R.string.about_version_prefix)} $versionName&quot;"
         errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/java/com/example/chatup/activities/AboutActivity.kt"
+            file="src/main/java/com/example/chatup/ui/settings/AboutActivity.kt"
             line="24"
             column="26"/>
     </issue>

@@ -1,6 +1,6 @@
 package com.example.chatup.data.repository
 
-import com.example.chatup.data.ChatMessage
+import com.example.chatup.data.model.ChatMessage
 import com.example.chatup.data.source.ChatDataSource
 import com.example.chatup.data.source.GroupChatDataSource
 import com.example.chatup.domain.repository.GroupChatRepository

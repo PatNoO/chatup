@@ -1,7 +1,7 @@
 package com.example.chatup.data.source
 
 import android.util.Log
-import com.example.chatup.data.User
+import com.example.chatup.data.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
