@@ -1,5 +1,7 @@
 package com.example.chatup.di
 
+import com.example.chatup.data.source.AuthDataSource
+import com.example.chatup.data.source.AuthDataSourceContract
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -22,4 +24,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = Firebase.firestore
+
+    @Provides
+    @Singleton
+    fun provideAuthDataSourceContract(impl: AuthDataSource): AuthDataSourceContract = impl
 }
